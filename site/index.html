@@ -3,45 +3,359 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Information Organization 101</title>
+    <title>資訊組織課程知識庫</title>
     <style>
       :root {
         color-scheme: light;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: #1f2933;
         background: #f7f8fa;
+        --ink: #172333;
+        --muted: #5d6975;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --accent-soft: #e7f0f6;
+        --green: #2a8c7b;
       }
 
       body {
         margin: 0;
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 42%, #eef3f6 100%);
       }
 
-      main {
-        width: min(720px, calc(100% - 48px));
+      .site {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 44px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand strong {
+        color: var(--ink);
+        font-size: 1rem;
+        letter-spacing: 0;
+      }
+
+      .brand span {
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      nav a {
+        color: #334155;
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        border-bottom: 2px solid transparent;
+      }
+
+      nav a:hover {
+        border-color: var(--green);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+        gap: 48px;
+        align-items: end;
+        padding-bottom: 46px;
+        border-bottom: 1px solid var(--line);
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 6vw, 4rem);
-        line-height: 1;
+        margin: 0 0 18px;
+        color: var(--ink);
+        font-size: clamp(2.4rem, 5vw, 4.8rem);
+        line-height: 1.06;
         letter-spacing: 0;
       }
 
       p {
         margin: 0;
-        font-size: 1.125rem;
+        font-size: 1rem;
         line-height: 1.7;
-        color: #52616b;
+        color: var(--muted);
+      }
+
+      .lede {
+        max-width: 760px;
+        font-size: 1.18rem;
+        color: #43505d;
+      }
+
+      .search-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 18px 42px rgba(23, 35, 51, 0.08);
+      }
+
+      .search-label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--ink);
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 0 14px;
+        border: 1px solid #cbd5df;
+        border-radius: 6px;
+        color: #6b7785;
+        background: #fbfcfd;
+      }
+
+      .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .quick-links a {
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-radius: 6px;
+        padding: 6px 9px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 650;
+      }
+
+      .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 24px;
+        margin: 42px 0 18px;
+      }
+
+      h2 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 1.4rem;
+        letter-spacing: 0;
+      }
+
+      .section-heading p {
+        max-width: 520px;
+        font-size: 0.95rem;
+      }
+
+      .topics {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .topic {
+        min-height: 220px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+      }
+
+      .topic-number {
+        color: var(--green);
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      h3 {
+        min-height: 58px;
+        margin: 12px 0 10px;
+        color: var(--ink);
+        font-size: 1.08rem;
+        line-height: 1.35;
+        letter-spacing: 0;
+      }
+
+      .topic p {
+        font-size: 0.92rem;
+      }
+
+      .notes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .note {
+        padding: 16px;
+        border-left: 3px solid var(--accent);
+        background: #ffffff;
+      }
+
+      .note strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+      }
+
+      footer {
+        margin-top: 48px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      @media (max-width: 920px) {
+        header,
+        .hero,
+        .section-heading {
+          display: block;
+        }
+
+        nav {
+          justify-content: flex-start;
+          margin-top: 18px;
+        }
+
+        .search-panel {
+          margin-top: 28px;
+        }
+
+        .topics,
+        .notes {
+          grid-template-columns: 1fr;
+        }
+
+        .topic {
+          min-height: auto;
+        }
+
+        h3 {
+          min-height: auto;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Hello World</h1>
-      <p>Information Organization 101 is ready for its first GitHub Pages test.</p>
-    </main>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <strong>資訊組織課程知識庫</strong>
+          <span>Information Organization 101</span>
+        </div>
+        <nav aria-label="主要導覽">
+          <a href="#description">敘述編目</a>
+          <a href="#subject">主題編目</a>
+          <a href="#data">資料擷取與處理</a>
+          <a href="#classification">自動分類</a>
+          <a href="#graph">知識圖譜</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="site-title">
+          <div>
+            <h1 id="site-title">資訊組織課程知識庫</h1>
+            <p class="lede">
+              這裡整理資訊組織課程中的核心概念、編目與分類規則、資料處理方法，以及面向數位環境的自動分類與知識圖譜實作。網站以查找與閱讀為中心，協助學生在課前預習、課後複習與作業實作之間快速定位所需資料。
+            </p>
+          </div>
+
+          <aside class="search-panel" aria-label="資料查找入口">
+            <span class="search-label">查找課程資料</span>
+            <div class="search-box" role="search">搜尋規則、範例、程式碼或術語</div>
+            <div class="quick-links" aria-label="快速入口">
+              <a href="#description">編目規則</a>
+              <a href="#subject">主題分析</a>
+              <a href="#data">程式碼範例</a>
+              <a href="#graph">概念關係</a>
+            </div>
+          </aside>
+        </section>
+
+        <section aria-labelledby="topics-title">
+          <div class="section-heading">
+            <h2 id="topics-title">課程主題</h2>
+            <p>每個主題都會逐步收錄教材筆記、規則摘要、課堂範例、常見錯誤與延伸閱讀，形成可持續更新的課程資料入口。</p>
+          </div>
+
+          <div class="topics">
+            <article class="topic" id="description">
+              <span class="topic-number">01</span>
+              <h3>敘述編目</h3>
+              <p>整理資源著錄的基本原則、欄位結構與規則應用，協助學生理解如何將實體或數位資源轉化為可辨識的書目描述。</p>
+            </article>
+
+            <article class="topic" id="subject">
+              <span class="topic-number">02</span>
+              <h3>主題編目</h3>
+              <p>聚焦主題分析、標題詞選擇與分類號判斷，建立從內容理解到檢索語彙控制之間的連結。</p>
+            </article>
+
+            <article class="topic" id="data">
+              <span class="topic-number">03</span>
+              <h3>資料擷取與處理</h3>
+              <p>提供資料清理、格式轉換、欄位解析與程式碼範例，讓編目資料能進一步被分析、整合與重複使用。</p>
+            </article>
+
+            <article class="topic" id="classification">
+              <span class="topic-number">04</span>
+              <h3>自動分類</h3>
+              <p>介紹文字特徵、規則式方法與機器學習分類概念，討論自動化技術如何輔助資料組織與主題判斷。</p>
+            </article>
+
+            <article class="topic" id="graph">
+              <span class="topic-number">05</span>
+              <h3>知識圖譜</h3>
+              <p>從實體、關係與語意連結出發，理解知識圖譜如何呈現資源脈絡，並延伸到鏈結資料與知識組織系統。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="notes" aria-label="網站資料類型">
+          <div class="note">
+            <strong>教材筆記</strong>
+            <p>用清楚層級整理每週重點，保留規則、定義與例子的上下文。</p>
+          </div>
+          <div class="note">
+            <strong>實作範例</strong>
+            <p>收錄可閱讀的程式碼、資料處理流程與課堂練習素材。</p>
+          </div>
+          <div class="note">
+            <strong>術語索引</strong>
+            <p>將編目、分類與知識組織相關術語整理成可查找的參照入口。</p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        Information Organization 101. Course materials for learning, reading, and retrieval.
+      </footer>
+    </div>
   </body>
 </html>
