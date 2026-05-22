@@ -211,6 +211,63 @@
         font-size: clamp(1.45rem, 2vw, 1.8rem);
       }
 
+      .concept-figure {
+        margin: 4px 0 6px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        overflow-x: auto;
+      }
+
+      .concept-figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        font-family: inherit;
+      }
+
+      .diagram-node {
+        fill: #f7fbfd;
+        stroke: #b9c8d8;
+        stroke-width: 2;
+      }
+
+      .diagram-property {
+        fill: #fff5ec;
+        stroke: #e0c1ad;
+        stroke-width: 2;
+      }
+
+      .diagram-line {
+        stroke: var(--green);
+        stroke-width: 3;
+      }
+
+      .diagram-attribute-line {
+        stroke: var(--orange);
+        stroke-width: 2.5;
+        stroke-dasharray: 7 7;
+      }
+
+      .diagram-label {
+        fill: var(--ink);
+        font-size: 32px;
+        font-weight: 800;
+      }
+
+      .diagram-note {
+        fill: var(--muted);
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .diagram-edge-label {
+        fill: #ffffff;
+        font-size: 26px;
+        font-weight: 800;
+      }
+
       .term-list,
       .life-grid {
         display: grid;
@@ -440,6 +497,100 @@
         font-weight: 800;
       }
 
+      .record-examples {
+        display: grid;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .record-example {
+        display: grid;
+        gap: 10px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--accent);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .record-example-heading {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+      }
+
+      .record-example-heading code {
+        font-size: clamp(1.08rem, 1.45vw, 1.28rem);
+        font-weight: 800;
+      }
+
+      .record-role {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: #ffffff;
+        background: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .record-task {
+        color: var(--muted);
+        font-size: clamp(1.12rem, 1.5vw, 1.35rem);
+        line-height: 1.65;
+      }
+
+      .record-relation-figure {
+        margin: 4px 0 0;
+        padding: 16px;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .record-relation-figure svg {
+        display: block;
+        width: 100%;
+        min-width: 540px;
+        height: auto;
+        font-family: inherit;
+      }
+
+      .relation-source {
+        fill: #f7fbfd;
+        stroke: #b9c8d8;
+        stroke-width: 2;
+      }
+
+      .relation-target {
+        fill: #ffffff;
+        stroke: #c5d3df;
+        stroke-width: 2;
+      }
+
+      .relation-link {
+        stroke: var(--green);
+        stroke-width: 2.5;
+      }
+
+      .relation-mini-label {
+        fill: var(--ink);
+        font-size: 28px;
+        font-weight: 800;
+      }
+
+      .relation-mini-note {
+        fill: var(--muted);
+        font-size: 20px;
+        font-weight: 700;
+      }
+
       .takeaway {
         padding: 26px;
         border: 1px solid #c9d8d4;
@@ -548,6 +699,10 @@
           align-items: start;
         }
 
+        .concept-figure svg {
+          min-width: 640px;
+        }
+
         .edge {
           width: 100%;
         }
@@ -582,7 +737,8 @@
           <a href="#what-is-kg" aria-current="page">1. 什麼是 KG</a>
           <a href="#library-view">2. 圖書館為何需要</a>
           <a href="#record-to-graph">3. 從紀錄到關係</a>
-          <a href="#try-it">4. 小練習</a>
+          <a href="#subject-entity">4. 主題作為實體</a>
+          <a href="#try-it">5. 小練習</a>
         </nav>
 
         <section class="section" aria-labelledby="goals-title">
@@ -590,10 +746,9 @@
             <h2 id="goals-title">本單元目標</h2>
             <div class="content">
               <ul>
-                <li>用自己的話說明知識圖譜不是一張圖片，而是一種資料組織方式。</li>
-                <li>分辨實體、關係與屬性在圖書館資料中的角色。</li>
-                <li>看出一筆書目紀錄中隱藏了哪些可以被連結的知識。</li>
-                <li>理解知識圖譜在資訊組織中的基本任務：辨識、命名、連結與維護。</li>
+                <li>說明知識圖譜是什麼。</li>
+                <li>分辨實體、關係與屬性在知識圖譜中的角色。</li>
+                <li>由書目紀錄中看出被連結的實體和屬性。</li>
               </ul>
             </div>
           </div>
@@ -601,7 +756,7 @@
 
         <section class="section" id="what-is-kg" aria-labelledby="concept-title">
           <div class="section-heading">
-            <h2 id="concept-title">知識圖譜的重點</h2>
+            <h2 id="concept-title">知識圖譜</h2>
             <div class="content">
               <p class="statement">
                 知識圖譜不是要畫出漂亮的圖，而是把知識拆成可辨識的東西，並清楚說明它們之間的關係。
@@ -612,6 +767,40 @@
               <p>
                 知識圖譜是在組織東西之間的關係。要做到這件事，必須先把資料拆成幾個基本元素：哪些是被描述的對象（實體），哪些是對象之間的連結（關係），哪些只是用來補充描述的資料值（屬性）。
               </p>
+
+              <figure class="concept-figure" aria-label="實體、關係與屬性的概念圖">
+                <svg viewBox="0 0 920 390" role="img" aria-labelledby="concept-figure-title concept-figure-desc">
+                  <title id="concept-figure-title">實體、關係與屬性</title>
+                  <desc id="concept-figure-desc">兩個實體之間以關係連結，屬性則附著在實體旁邊，用資料值補充描述實體。</desc>
+                  <defs>
+                    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                    </marker>
+                  </defs>
+                  <rect x="58" y="132" width="210" height="110" rx="8" class="diagram-node"></rect>
+                  <text x="163" y="180" text-anchor="middle" class="diagram-label">實體</text>
+                  <text x="163" y="210" text-anchor="middle" class="diagram-note">被描述的對象</text>
+
+                  <rect x="652" y="132" width="210" height="110" rx="8" class="diagram-node"></rect>
+                  <text x="757" y="180" text-anchor="middle" class="diagram-label">實體</text>
+                  <text x="757" y="210" text-anchor="middle" class="diagram-note">另一個對象</text>
+
+                  <line x1="278" y1="187" x2="642" y2="187" class="diagram-line" marker-end="url(#arrowhead)"></line>
+                  <rect x="390" y="147" width="140" height="54" rx="8" fill="#2a8c7b"></rect>
+                  <text x="460" y="181" text-anchor="middle" class="diagram-edge-label">關係</text>
+                  <text x="460" y="226" text-anchor="middle" class="diagram-note">命名兩者如何相連</text>
+
+                  <line x1="163" y1="132" x2="163" y2="72" class="diagram-attribute-line"></line>
+                  <rect x="72" y="28" width="182" height="56" rx="8" class="diagram-property"></rect>
+                  <text x="163" y="62" text-anchor="middle" class="diagram-label">屬性</text>
+                  <text x="163" y="105" text-anchor="middle" class="diagram-note">補充描述實體的資料值</text>
+
+                  <line x1="757" y1="242" x2="757" y2="302" class="diagram-attribute-line"></line>
+                  <rect x="666" y="306" width="182" height="56" rx="8" class="diagram-property"></rect>
+                  <text x="757" y="341" text-anchor="middle" class="diagram-label">屬性</text>
+                  <text x="757" y="284" text-anchor="middle" class="diagram-note">例如名稱、日期、語言</text>
+                </svg>
+              </figure>
 
               <div class="term-list" aria-label="知識圖譜基本元素">
                 <article class="term-item">
@@ -825,7 +1014,10 @@
             <h2 id="record-title">從紀錄到圖譜</h2>
             <div class="content">
               <p>
-                一筆 MARC 或 OPAC 紀錄通常看起來像一個完整包裹；知識圖譜則會問：包裹裡有哪些不同的東西？哪些是人？哪些是作品？哪些是版本？哪些只是描述值？
+                一筆 MARC 或 OPAC 的書目紀錄，通常看起來像一個完整包裹。
+              </p>
+              <p>
+                知識圖譜則會問：包裹裡有哪些不同的東西？哪些是人？哪些是作品？哪些是版本？哪些只是描述值？
               </p>
 
               <h3 class="subtopic-title">例子：西遊記</h3>
@@ -878,41 +1070,93 @@
                 這樣做看起來是把一筆紀錄切得更零碎，但因為實體之間的關係被建立起來，不同紀錄中的人物、作品、版本與單件就可以彼此串接，形成一個更大的查詢網。使用者不只查到一筆紀錄，也能沿著關係找到同一作者的其他作品、同一作品的不同版本，以及某個版本在館內的不同單件。
               </p>
 
-              <table>
-                <thead>
-                  <tr>
-                    <th>書目資料中的資訊</th>
-                    <th>圖譜中的角色</th>
-                    <th>資訊組織要做的事</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>吳承恩</code></td>
-                    <td>人物實體</td>
-                    <td>確認名稱指向哪一個人，並讓使用者能找到吳承恩的其他作品。</td>
-                  </tr>
-                  <tr>
-                    <td><code>西遊記</code></td>
-                    <td>作品實體</td>
-                    <td>把作品本身和不同版本、譯本、改寫本、改編本串接起來。</td>
-                  </tr>
-                  <tr>
-                    <td><code>某出版社 2020 年版</code></td>
-                    <td>版本或具體呈現</td>
-                    <td>連回它所呈現的作品，也能連到同一版本的不同館藏單件。</td>
-                  </tr>
-                  <tr>
-                    <td><code>本館條碼 A001</code></td>
-                    <td>館藏單件實體</td>
-                    <td>表示館內實際持有的一件資源，並連到所在館藏位置與借閱狀態。</td>
-                  </tr>
-                </tbody>
-              </table>
+              <ul class="record-examples" aria-label="書目資料轉成知識圖譜角色的例子">
+                <li class="record-example">
+                  <div class="record-example-heading">
+                    <code>吳承恩</code>
+                    <span class="record-role">人物實體</span>
+                  </div>
+                  <p class="record-task">確認名稱指向哪一個人，並讓使用者能找到吳承恩的其他作品。</p>
+                  <figure class="record-relation-figure" aria-label="吳承恩連到多部作品的關係圖">
+                    <svg viewBox="0 0 760 360" role="img" aria-labelledby="wuchengen-title wuchengen-desc">
+                      <title id="wuchengen-title">吳承恩與作品</title>
+                      <desc id="wuchengen-desc">吳承恩作為人物實體，透過創作關係連到禹鼎記、西遊記、花草新編與二郎搜山圖歌。</desc>
+                      <defs>
+                        <marker id="author-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                        </marker>
+                      </defs>
+                      <rect x="42" y="145" width="150" height="70" rx="8" class="relation-source"></rect>
+                      <text x="117" y="174" text-anchor="middle" class="relation-mini-label">吳承恩</text>
+                      <text x="117" y="199" text-anchor="middle" class="relation-mini-note">人物實體</text>
 
-              <h3 class="subtopic-title">主題概念也可以是實體</h3>
+                      <line x1="198" y1="180" x2="392" y2="64" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="142" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="220" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="298" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <text x="284" y="166" text-anchor="middle" class="relation-mini-note">創作</text>
+
+                      <rect x="400" y="30" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="64" text-anchor="middle" class="relation-mini-label">《禹鼎記》</text>
+                      <rect x="400" y="108" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="142" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="400" y="186" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="220" text-anchor="middle" class="relation-mini-label">《花草新編》</text>
+                      <rect x="400" y="264" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="298" text-anchor="middle" class="relation-mini-label">《二郎搜山圖歌》</text>
+                    </svg>
+                  </figure>
+                </li>
+                <li class="record-example">
+                  <div class="record-example-heading">
+                    <code>西遊記</code>
+                    <span class="record-role">作品實體</span>
+                  </div>
+                  <p class="record-task">把作品本身和不同版本、譯本、改寫本、改編本串接起來。</p>
+                  <figure class="record-relation-figure" aria-label="西遊記連到不同語文版本的關係圖">
+                    <svg viewBox="0 0 760 420" role="img" aria-labelledby="xiyouji-title xiyouji-desc">
+                      <title id="xiyouji-title">西遊記與語文版本</title>
+                      <desc id="xiyouji-desc">西遊記作為作品實體，連到繁中、簡中、日文、韓文與英文的常見書名。</desc>
+                      <defs>
+                        <marker id="version-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                        </marker>
+                      </defs>
+                      <rect x="42" y="175" width="150" height="70" rx="8" class="relation-source"></rect>
+                      <text x="117" y="204" text-anchor="middle" class="relation-mini-label">西遊記</text>
+                      <text x="117" y="229" text-anchor="middle" class="relation-mini-note">作品實體</text>
+
+                      <line x1="198" y1="210" x2="372" y2="54" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="132" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="210" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="288" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="366" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <text x="284" y="196" text-anchor="middle" class="relation-mini-note">有語文版本</text>
+
+                      <rect x="380" y="20" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="54" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="380" y="98" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="132" text-anchor="middle" class="relation-mini-label">《西游记》</text>
+                      <rect x="380" y="176" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="210" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="380" y="254" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="288" text-anchor="middle" class="relation-mini-label">《서유기》</text>
+                      <rect x="380" y="332" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="366" text-anchor="middle" class="relation-mini-label">Journey to the West</text>
+                    </svg>
+                  </figure>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="subject-entity" aria-labelledby="subject-title">
+          <div class="section-heading">
+            <h2 id="subject-title">主題概念也可以是實體</h2>
+            <div class="content">
               <p>
-                主題不一定只是文字標籤。在知識圖譜中，主題概念也可以成為實體，因為它能和許多作品、分類系統、相關主題或外部知識庫連在一起。這樣一來，使用者查詢某個主題時，不只會找到包含相同文字的紀錄，也能找到被同一主題概念連接起來的資源。
+                主題不一定只是文字標籤。在知識圖譜中，主題概念也可以成為實體。只要一個概念能被穩定辨識，並能和其他資料建立關係，它就可以在知識圖譜中被視為實體。所以，雖然中國古典小說不是一本實際存在的書，也不是一個人或一件館藏，但它仍然是一個可以被明確指認、命名和維護的概念。
               </p>
 
               <div class="example-map" aria-label="主題概念作為實體的知識圖譜範例">
@@ -923,15 +1167,14 @@
                 </div>
                 <div class="relation-row">
                   <div class="node">中國古典小說</div>
-                  <div class="edge">相關主題</div>
-                  <div class="node">章回小說</div>
-                </div>
-                <div class="relation-row">
-                  <div class="node">中國古典小說</div>
-                  <div class="edge">包含作品</div>
+                  <div class="edge">有作品</div>
                   <div class="node">三國演義</div>
                 </div>
               </div>
+
+              <p>
+                因為中國古典小說能被當成實體，它也可以像人物、作品或館藏單件一樣擁有屬性。這些屬性不是在描述某一本書，而是在描述這個主題概念本身，例如它屬於哪一種類型、主要使用哪一種語言，或是否對應到某個分類號、主題詞表編號或外部知識庫識別碼。
+              </p>
 
               <div class="attribute-map" aria-label="主題概念屬性範例">
                 <div class="attribute-row">
@@ -943,6 +1186,33 @@
                   <div class="node">中國古典小說</div>
                   <div class="attribute-key">語言</div>
                   <div class="attribute-value">中文</div>
+                </div>
+              </div>
+
+              <p>
+                把主題概念視為實體的用處，是讓主題不只停留在紀錄裡的一串文字，而能成為連結資料的節點。因為它能和許多作品、分類系統、相關主題或外部知識庫連在一起。這樣一來，使用者查詢某個主題時，不只會找到包含相同文字的紀錄，也能找到被同一主題概念連接起來的資源。
+              </p>
+
+              <div class="example-map" aria-label="使用主題概念串接不同作品的範例">
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">西遊記</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">三國演義</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">水滸傳</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">紅樓夢</div>
                 </div>
               </div>
             </div>
