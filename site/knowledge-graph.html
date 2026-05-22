@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>05 知識圖譜｜資訊組識課程庫</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --soft: #eef3f6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 56px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand strong {
+        color: var(--ink);
+        font-size: 1.08rem;
+        letter-spacing: 0;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3.2rem, 7vw, 6.2rem);
+        line-height: 1.02;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.45rem, 2.3vw, 2rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        color: var(--muted);
+        font-size: clamp(1.28rem, 1.7vw, 1.55rem);
+        line-height: 1.72;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .statement {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .statement strong {
+        color: var(--ink);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        min-height: 210px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.88);
+      }
+
+      .card span {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      h3 {
+        margin: 10px 0 12px;
+        color: var(--ink);
+        font-size: clamp(1.45rem, 2vw, 1.8rem);
+        line-height: 1.3;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        padding: 20px;
+        border-top: 4px solid var(--accent);
+        background: var(--panel);
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-size: 1.35rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+      }
+
+      th,
+      td {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--ink);
+        background: var(--soft);
+        font-weight: 800;
+      }
+
+      code {
+        padding: 0.12em 0.28em;
+        border-radius: 5px;
+        color: #12324a;
+        background: #e7f0f6;
+        font-size: 0.95em;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .grid,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <strong>資訊組識課程庫</strong>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="index.html">返回課程主題</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph</span>
+          <h1 id="page-title">知識圖譜</h1>
+          <p class="lede">
+            知識圖譜將資料中的實體、概念與關係轉化為可計算的語意網絡。它不只描述「有哪些資料」，也描述資料之間如何互相指涉、支撐與推論。
+          </p>
+        </section>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">學習目標</h2>
+            <div class="content">
+              <ul>
+                <li>辨識知識圖譜中的實體、屬性與關係。</li>
+                <li>理解三元組如何表達一筆可被機器處理的知識陳述。</li>
+                <li>說明知識圖譜與編目、分類、權威控制之間的關聯。</li>
+                <li>以圖譜觀點重新組織一組課程或館藏資料。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="concept-title">
+          <div class="section-heading">
+            <h2 id="concept-title">核心概念</h2>
+            <div class="content">
+              <p class="statement">
+                <strong>知識圖譜的重點不是把資料畫成圖，而是讓資料中的關係具備明確語意。</strong>
+                當關係被清楚命名，資料就能被查詢、連結、比較與推論。
+              </p>
+
+              <div class="grid">
+                <article class="card">
+                  <span>Entity</span>
+                  <h3>實體</h3>
+                  <p>可被識別的對象，例如人物、作品、主題、機構、地點或事件。</p>
+                </article>
+                <article class="card">
+                  <span>Relation</span>
+                  <h3>關係</h3>
+                  <p>實體之間的語意連結，例如作者、改編自、屬於、位於或研究主題。</p>
+                </article>
+                <article class="card">
+                  <span>Attribute</span>
+                  <h3>屬性</h3>
+                  <p>描述實體的資料值，例如名稱、日期、識別碼、語言或版本。</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="workflow-title">
+          <div class="section-heading">
+            <h2 id="workflow-title">建置流程</h2>
+            <div class="content">
+              <div class="flow">
+                <div class="step">
+                  <strong>1. 界定範圍</strong>
+                  <p>決定圖譜要回答的問題與資料邊界。</p>
+                </div>
+                <div class="step">
+                  <strong>2. 建立模型</strong>
+                  <p>定義實體類型、關係類型與必要屬性。</p>
+                </div>
+                <div class="step">
+                  <strong>3. 轉換資料</strong>
+                  <p>將表格、書目或文字資料整理為一致格式。</p>
+                </div>
+                <div class="step">
+                  <strong>4. 查詢應用</strong>
+                  <p>透過檢索、視覺化或推論呈現資料關係。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="triple-title">
+          <div class="section-heading">
+            <h2 id="triple-title">三元組範例</h2>
+            <div class="content">
+              <table>
+                <thead>
+                  <tr>
+                    <th>主詞 Subject</th>
+                    <th>謂詞 Predicate</th>
+                    <th>受詞 Object</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>西遊記</code></td>
+                    <td><code>作者</code></td>
+                    <td><code>吳承恩</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>西遊記</code></td>
+                    <td><code>主題</code></td>
+                    <td><code>中國古典小說</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>吳承恩</code></td>
+                    <td><code>身分</code></td>
+                    <td><code>作家</code></td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>三元組讓每一筆知識陳述都具備固定結構，也讓不同資料來源之間能夠進行語意對接。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="cataloging-title">
+          <div class="section-heading">
+            <h2 id="cataloging-title">與編目的關係</h2>
+            <div class="content">
+              <p>
+                傳統編目重視資源的描述與檢索點，知識圖譜則進一步把檢索點轉化為可連結的實體。作者、作品、主題標目、分類號與機構名稱，都可以成為圖譜中的節點。
+              </p>
+              <p>
+                從這個角度看，權威控制不只是名稱一致化，也是在建立穩定的實體識別；主題編目不只是選擇標題詞，也是在安排知識網絡中的語意位置。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="discussion-title">
+          <div class="section-heading">
+            <h2 id="discussion-title">課堂討論</h2>
+            <div class="content">
+              <ol>
+                <li>如果要為一門課建立知識圖譜，哪些內容適合成為實體？</li>
+                <li>同一個人物在不同資料來源有不同名稱時，圖譜應該如何處理？</li>
+                <li>知識圖譜能解決哪些傳統關鍵字檢索不容易處理的問題？</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        05 知識圖譜｜資訊組識課程庫
+      </footer>
+    </div>
+  </body>
+</html>
