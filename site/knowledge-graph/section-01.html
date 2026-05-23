@@ -1,0 +1,1436 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>05 知識圖譜｜資訊組識課程庫</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 56px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        letter-spacing: 0;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3.2rem, 7vw, 6.2rem);
+        line-height: 1.02;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.45rem, 2.3vw, 2rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-nav,
+      .section-pager {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .chapter-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        color: var(--muted);
+        font-size: clamp(1.28rem, 1.7vw, 1.55rem);
+        line-height: 1.72;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .statement {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .term-label {
+        display: inline;
+        margin-right: 4px;
+        color: var(--ink);
+        font-size: 1em;
+        font-weight: 800;
+      }
+
+      .subtopic-title {
+        margin: 6px 0 0;
+        font-size: clamp(1.45rem, 2vw, 1.8rem);
+      }
+
+      .concept-figure {
+        margin: 4px 0 6px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        overflow-x: auto;
+      }
+
+      .concept-figure svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        font-family: inherit;
+      }
+
+      .diagram-node {
+        fill: #f7fbfd;
+        stroke: #b9c8d8;
+        stroke-width: 2;
+      }
+
+      .diagram-property {
+        fill: #fff5ec;
+        stroke: #e0c1ad;
+        stroke-width: 2;
+      }
+
+      .diagram-line {
+        stroke: var(--green);
+        stroke-width: 3;
+      }
+
+      .diagram-attribute-line {
+        stroke: var(--orange);
+        stroke-width: 2.5;
+        stroke-dasharray: 7 7;
+      }
+
+      .diagram-label {
+        fill: var(--ink);
+        font-size: 32px;
+        font-weight: 800;
+      }
+
+      .diagram-note {
+        fill: var(--muted);
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .diagram-edge-label {
+        fill: #ffffff;
+        font-size: 26px;
+        font-weight: 800;
+      }
+
+      .term-list,
+      .life-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .term-item,
+      .life-card {
+        display: grid;
+        grid-template-columns: 168px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .term-mark {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+        color: var(--ink);
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .term-code {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border-radius: 8px;
+        color: #ffffff;
+        background: var(--green);
+      }
+
+      .term-name {
+        color: var(--accent);
+        font-size: clamp(1.28rem, 1.7vw, 1.55rem);
+        white-space: nowrap;
+      }
+
+      .icon-box {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--accent);
+        background: #eaf1f6;
+      }
+
+      .life-heading {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      .icon-box svg {
+        width: 24px;
+        height: 24px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .life-card h3 {
+        margin: 0;
+        font-size: clamp(1.28rem, 1.7vw, 1.55rem);
+        white-space: nowrap;
+      }
+
+      .term-item p + p {
+        margin-top: 4px;
+      }
+
+      .life-card p + p {
+        margin-top: 6px;
+      }
+
+      .life-card code {
+        display: block;
+        width: fit-content;
+        margin-top: 6px;
+      }
+
+      .plain-panel {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .plain-panel h3 {
+        margin-top: 0;
+      }
+
+      .contrast {
+        background: var(--warm);
+      }
+
+      .mini-label {
+        display: inline-block;
+        margin-bottom: 10px;
+        color: var(--orange);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .source-figure {
+        margin: 0;
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .source-figure img {
+        width: 100%;
+        max-width: 760px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .source-figure figcaption {
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .source-figure a {
+        color: var(--accent);
+      }
+
+      .kg-example-figure .image-crop {
+        width: 100%;
+        max-width: 760px;
+        aspect-ratio: 1456 / 544;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .kg-example-figure .image-crop img {
+        display: block;
+        width: 100%;
+        max-width: none;
+        border: 0;
+        border-radius: 0;
+        transform: translateY(-25%);
+      }
+
+      .query-compare {
+        margin: 4px 0 6px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .query-item {
+        display: grid;
+        grid-template-columns: 140px minmax(0, 1fr);
+        gap: 14px;
+        align-items: baseline;
+      }
+
+      .query-item + .query-item {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .query-item strong {
+        color: var(--accent);
+        font-size: 0.9rem;
+      }
+
+      .query-item p {
+        margin: 0;
+        color: var(--ink);
+        font-size: 1rem;
+        line-height: 1.65;
+      }
+
+      .example-map {
+        display: grid;
+        gap: 12px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .relation-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .node,
+      .edge {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 12px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: clamp(1rem, 1.3vw, 1.18rem);
+        line-height: 1.35;
+      }
+
+      .node {
+        color: var(--ink);
+        border: 1px solid #b9c8d8;
+        background: #f7fbfd;
+        font-weight: 800;
+      }
+
+      .edge {
+        min-width: 132px;
+        color: #ffffff;
+        background: var(--green);
+        font-weight: 800;
+      }
+
+      .attribute-map {
+        display: grid;
+        gap: 12px;
+        padding: 24px;
+        border: 1px solid #e3cdbd;
+        border-radius: 8px;
+        background: #fffaf5;
+      }
+
+      .attribute-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+      }
+
+      .attribute-key,
+      .attribute-value {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 12px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: clamp(1rem, 1.3vw, 1.18rem);
+        line-height: 1.35;
+      }
+
+      .attribute-key {
+        min-width: 132px;
+        color: #ffffff;
+        background: var(--orange);
+        font-weight: 800;
+      }
+
+      .attribute-value {
+        color: #5b3a25;
+        border: 1px solid #e0c1ad;
+        background: #fff3e8;
+        font-weight: 800;
+      }
+
+      .record-examples {
+        display: grid;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .record-example {
+        display: grid;
+        gap: 10px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--accent);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .record-example-heading {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+      }
+
+      .record-example-heading code {
+        font-size: clamp(1.08rem, 1.45vw, 1.28rem);
+        font-weight: 800;
+      }
+
+      .record-role {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: #ffffff;
+        background: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .record-task {
+        color: var(--muted);
+        font-size: clamp(1.12rem, 1.5vw, 1.35rem);
+        line-height: 1.65;
+      }
+
+      .record-relation-figure {
+        margin: 4px 0 0;
+        padding: 16px;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .record-relation-figure svg {
+        display: block;
+        width: 100%;
+        min-width: 540px;
+        height: auto;
+        font-family: inherit;
+      }
+
+      .relation-source {
+        fill: #f7fbfd;
+        stroke: #b9c8d8;
+        stroke-width: 2;
+      }
+
+      .relation-target {
+        fill: #ffffff;
+        stroke: #c5d3df;
+        stroke-width: 2;
+      }
+
+      .relation-link {
+        stroke: var(--green);
+        stroke-width: 2.5;
+      }
+
+      .relation-mini-label {
+        fill: var(--ink);
+        font-size: 28px;
+        font-weight: 800;
+      }
+
+      .relation-mini-note {
+        fill: var(--muted);
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .takeaway {
+        padding: 26px;
+        border: 1px solid #c9d8d4;
+        border-radius: 8px;
+        background: #f0f8f5;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-top: 10px;
+        border-bottom: 0;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        min-height: 120px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-link:hover {
+        border-color: #b8c7d6;
+        box-shadow: 0 14px 32px rgba(23, 35, 51, 0.06);
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      h3 {
+        margin: 10px 0 12px;
+        color: var(--ink);
+        font-size: clamp(1.45rem, 2vw, 1.8rem);
+        line-height: 1.3;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .step {
+        padding: 20px;
+        border-top: 4px solid var(--accent);
+        background: var(--panel);
+      }
+
+      .step-title {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ink);
+        font-size: 1.35rem;
+        line-height: 1.35;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+      }
+
+      th,
+      td {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--ink);
+        background: var(--soft);
+        font-weight: 800;
+      }
+
+      code {
+        padding: 0.12em 0.28em;
+        border-radius: 5px;
+        color: #12324a;
+        background: #e7f0f6;
+        font-size: 0.95em;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .two-column,
+        .flow,
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+
+        .query-item {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+
+        .relation-row {
+          grid-template-columns: 1fr;
+        }
+
+        .attribute-row {
+          grid-template-columns: 1fr;
+        }
+
+        .term-item,
+        .life-card {
+          grid-template-columns: 1fr;
+          align-items: start;
+        }
+
+        .concept-figure svg {
+          min-width: 640px;
+        }
+
+        .edge {
+          width: 100%;
+        }
+
+        th,
+        td {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組識課程庫</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">返回課程主題</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph</span>
+          <h1 id="page-title">什麼是 Knowledge Graph？</h1>
+          <p class="lede">
+            知識圖譜是一種用實體和關係來組織知識的方法。對圖書館來說，它讓一筆筆書目紀錄背後的作者、作品、版本、主題與館藏，變成可以被連結與探索的知識網絡。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="知識圖譜單元">
+          <a href="#what-is-kg" aria-current="page">1. 知識圖譜</a>
+          <a href="#library-view">2. 圖書館視角：書目紀錄與知識圖譜</a>
+          <a href="#record-to-graph">3. 從紀錄到網絡資料結構</a>
+          <a href="#subject-entity">4. 主題概念也可以是實體</a>
+          <a href="#kg-library-use">5. 對圖書館有什麼用</a>
+          <a href="#try-it">6. 小練習</a>
+        </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>說明知識圖譜是什麼。</li>
+                <li>分辨實體、關係與屬性在知識圖譜中的角色。</li>
+                <li>由書目紀錄中看出被連結的實體和屬性。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="what-is-kg" aria-labelledby="concept-title">
+          <div class="section-heading">
+            <h2 id="concept-title">知識圖譜</h2>
+            <div class="content">
+              <p class="statement">
+                知識圖譜不是要畫出漂亮的圖，而是把知識拆成可辨識的東西，並清楚說明它們之間的關係。
+                當不同東西間的關係被清楚命名，資料就不只是文字清單，而能被查詢、連結、比較與重複使用。
+              </p>
+
+              <p>
+                知識圖譜通常可以概括理解為：以圖結構表示知識。在這種結構中，節點代表實體或概念，邊代表它們之間的關係。換句話說，知識圖譜關心的不只是有哪些資料項目，也關心這些資料項目如何彼此相連。
+              </p>
+
+              <h3 class="subtopic-title">基本元素：實體、關係、屬性</h3>
+              <p>
+                知識圖譜是在組織東西之間的關係。要做到這件事，必須先把資料拆成幾個基本元素：哪些是被描述的對象（實體），哪些是對象之間的連結（關係），哪些只是用來補充描述的資料值（屬性）。
+              </p>
+
+              <figure class="concept-figure" aria-label="實體、關係與屬性的概念圖">
+                <svg viewBox="0 0 920 390" role="img" aria-labelledby="concept-figure-title concept-figure-desc">
+                  <title id="concept-figure-title">實體、關係與屬性</title>
+                  <desc id="concept-figure-desc">兩個實體之間以關係連結，屬性則附著在實體旁邊，用資料值補充描述實體。</desc>
+                  <defs>
+                    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                    </marker>
+                  </defs>
+                  <rect x="58" y="132" width="210" height="110" rx="8" class="diagram-node"></rect>
+                  <text x="163" y="180" text-anchor="middle" class="diagram-label">實體</text>
+                  <text x="163" y="210" text-anchor="middle" class="diagram-note">被描述的對象</text>
+
+                  <rect x="652" y="132" width="210" height="110" rx="8" class="diagram-node"></rect>
+                  <text x="757" y="180" text-anchor="middle" class="diagram-label">實體</text>
+                  <text x="757" y="210" text-anchor="middle" class="diagram-note">另一個對象</text>
+
+                  <line x1="278" y1="187" x2="642" y2="187" class="diagram-line" marker-end="url(#arrowhead)"></line>
+                  <rect x="390" y="147" width="140" height="54" rx="8" fill="#2a8c7b"></rect>
+                  <text x="460" y="181" text-anchor="middle" class="diagram-edge-label">關係</text>
+                  <text x="460" y="226" text-anchor="middle" class="diagram-note">命名兩者如何相連</text>
+
+                  <line x1="163" y1="132" x2="163" y2="72" class="diagram-attribute-line"></line>
+                  <rect x="72" y="28" width="182" height="56" rx="8" class="diagram-property"></rect>
+                  <text x="163" y="62" text-anchor="middle" class="diagram-label">屬性</text>
+                  <text x="163" y="105" text-anchor="middle" class="diagram-note">補充描述實體的資料值</text>
+
+                  <line x1="757" y1="242" x2="757" y2="302" class="diagram-attribute-line"></line>
+                  <rect x="666" y="306" width="182" height="56" rx="8" class="diagram-property"></rect>
+                  <text x="757" y="341" text-anchor="middle" class="diagram-label">屬性</text>
+                  <text x="757" y="284" text-anchor="middle" class="diagram-note">例如名稱、日期、語言</text>
+                </svg>
+              </figure>
+
+              <div class="term-list" aria-label="知識圖譜基本元素">
+                <article class="term-item">
+                  <div class="term-mark" aria-hidden="true">
+                    <span class="term-code">E</span>
+                    <span class="term-name">實體</span>
+                  </div>
+                  <div>
+                    <p><span class="term-label">定義：</span>可被明確指認的對象。</p>
+                    <p><span class="term-label">例子：</span>作者、作品、出版社、主題、地點、時代或館藏單件。</p>
+                  </div>
+                </article>
+                <article class="term-item">
+                  <div class="term-mark" aria-hidden="true">
+                    <span class="term-code">R</span>
+                    <span class="term-name">關係</span>
+                  </div>
+                  <div>
+                    <p><span class="term-label">定義：</span>實體之間的語意連結。</p>
+                    <p><span class="term-label">例子：</span>創作、翻譯、改編、出版、屬於、評論或以某主題為內容。</p>
+                  </div>
+                </article>
+                <article class="term-item">
+                  <div class="term-mark" aria-hidden="true">
+                    <span class="term-code">A</span>
+                    <span class="term-name">屬性</span>
+                  </div>
+                  <div>
+                    <p><span class="term-label">定義：</span>描述實體本身的資料值。</p>
+                    <p><span class="term-label">例子：</span>名稱、日期、語言、識別碼、版本、頁數或出版年。</p>
+                  </div>
+                </article>
+              </div>
+
+              <h3 class="subtopic-title">生活化例子</h3>
+              <p>
+                下面是三個在生活情境中的實體、關係、屬性三元素描述例子。
+              </p>
+
+              <div class="life-grid" aria-label="生活化知識圖譜例子">
+                <article class="life-card">
+                  <div class="life-heading">
+                    <div class="icon-box" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M4 11.5 12 5l8 6.5"></path>
+                        <path d="M6.5 10.5V20h11v-9.5"></path>
+                        <path d="M10 20v-5h4v5"></path>
+                      </svg>
+                    </div>
+                    <h3>生活空間</h3>
+                  </div>
+                  <div>
+                    <p>家、房間、家具都可以是實體，位置與包含關係把它們連起來。</p>
+                    <p><code>書桌 → 位於 → 書房</code></p>
+                    <p><span class="term-label">實體：</span>書桌、書房</p>
+                    <p><span class="term-label">關係：</span>位於</p>
+                    <p><span class="term-label">屬性：</span>材質、尺寸、顏色</p>
+                  </div>
+                </article>
+                <article class="life-card">
+                  <div class="life-heading">
+                    <div class="icon-box" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="7" r="3"></circle>
+                        <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
+                      </svg>
+                    </div>
+                    <h3>人物關係</h3>
+                  </div>
+                  <div>
+                    <p>人、組織、事件可以被連成一張關係網，用來描述參與、任職或合作。</p>
+                    <p><code>小明 → 任職於 → 圖書館</code></p>
+                    <p><span class="term-label">實體：</span>小明、圖書館</p>
+                    <p><span class="term-label">關係：</span>任職於</p>
+                    <p><span class="term-label">屬性：</span>職稱、到職日</p>
+                  </div>
+                </article>
+                <article class="life-card">
+                  <div class="life-heading">
+                    <div class="icon-box" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M6 7h15l-2 8H8z"></path>
+                        <path d="M6 7 5 4H2"></path>
+                        <circle cx="9" cy="20" r="1.5"></circle>
+                        <circle cx="18" cy="20" r="1.5"></circle>
+                      </svg>
+                    </div>
+                    <h3>購物紀錄</h3>
+                  </div>
+                  <div>
+                    <p>商品、品牌、類別與價格可以被拆開，讓系統知道使用者買了什麼類型的東西。</p>
+                    <p><code>咖啡豆 → 屬於 → 食品</code></p>
+                    <p><span class="term-label">實體：</span>咖啡豆、食品</p>
+                    <p><span class="term-label">關係：</span>屬於</p>
+                    <p><span class="term-label">屬性：</span>品牌、重量、價格</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="library-view" aria-labelledby="library-title">
+          <div class="section-heading">
+            <h2 id="library-title">圖書館視角：書目紀錄與知識圖譜</h2>
+            <div class="content">
+              <p>
+                圖書館可以用知識圖譜，把編目累積的知識結構變得更容易被機器理解，也更容易和外部資料互通。下面的圖呈現的是傳統書目紀錄的樣子。分類號、題名、作者、出版者、出版年、頁數、叢書、ISBN 和系統號都集中在同一筆紀錄中，方便館員描述與讀者查找。
+              </p>
+
+              <article class="plain-panel contrast">
+                <span class="mini-label">傳統紀錄</span>
+                <h3>把資訊放一筆紀錄裡</h3>
+                <p>傳統書目紀錄在描述資源時，會把題名、作者、出版項、主題標目、分類號、館藏位置都被整理在固定欄位中，形成一整筆可供查找與管理的紀錄。</p>
+              </article>
+
+              <figure class="source-figure">
+                <img src="./assets/catalog-record-example.jpg" alt="傳統圖書館書目紀錄範例，包含分類號、題名、作者、出版項、稽核項、叢書項、ISBN 與館藏系統號等資訊。">
+                <figcaption>
+                  中文編目的卡片目錄。<br>
+                  圖片來源：國家圖書館，圖書資料編目與書目資源，<a href="https://catweb.ncl.edu.tw/sites/default/files/upload/training/02_%E5%9C%96%E6%9B%B8%E8%B3%87%E6%96%99%E7%B7%A8%E7%9B%AE%E8%88%87%E6%9B%B8%E7%9B%AE%E8%B3%87%E6%BA%90.pdf">原始 PDF</a>
+                </figcaption>
+              </figure>
+
+              <p>
+                如果改用知識圖譜的觀點，可以從這張卡片抽出具體的實體與關係。差異不在於資料內容變了，而是資料從一筆紀錄中的欄位，轉成可以彼此連結的知識節點。
+              </p>
+
+              <article class="plain-panel">
+                <span class="mini-label">知識圖譜</span>
+                <h3>把資訊拆成實體間的關係</h3>
+                <p>知識圖譜會把書名、作者、合作機構、出版地、發行者、叢書和識別碼分別辨識出來，再用明確關係把它們連起來。</p>
+              </article>
+
+              <div class="example-map" aria-label="從書目紀錄抽出的知識圖譜關係範例">
+                <div class="relation-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="edge">有作者</div>
+                  <div class="node">孫暐皓</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="edge">合作作者</div>
+                  <div class="node">臺灣愛鄉社區服務協會</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="edge">出版於</div>
+                  <div class="node">臺北縣新店市</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="edge">發行者</div>
+                  <div class="node">家庭傳媒城邦分公司</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="edge">屬於叢書</div>
+                  <div class="node">Soul</div>
+                </div>
+              </div>
+
+              <p>
+                這裡要先分清楚節點和屬性。節點通常是可以再被查詢、連到其他資料、或和其他資源建立關係的對象。屬性則比較像貼在某個節點上的描述值，用來幫助系統辨識、篩選、排序或區分資料。
+              </p>
+
+              <article class="plain-panel contrast">
+                <span class="mini-label">屬性</span>
+                <h3>補充描述某個實體本身</h3>
+                <p>不是書目紀錄中的每個欄位都需要變成另一個節點。例如出版年、頁數、尺寸、ISBN、價格和系統號，主要是在描述泰北愛無間這個書目資源本身。這些資料適合作為屬性。</p>
+              </article>
+
+              <div class="attribute-map" aria-label="從書目紀錄抽出的屬性範例">
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">出版年</div>
+                  <div class="attribute-value">2008</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">頁數</div>
+                  <div class="attribute-value">203 面</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">尺寸</div>
+                  <div class="attribute-value">19 公分</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">ISBN</div>
+                  <div class="attribute-value">978-986-7470-36-2</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">價格</div>
+                  <div class="attribute-value">NT$240</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">泰北愛無間</div>
+                  <div class="attribute-key">系統號</div>
+                  <div class="attribute-value">001921901</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="record-to-graph" aria-labelledby="record-title">
+          <div class="section-heading">
+            <h2 id="record-title">從紀錄到網絡資料結構</h2>
+            <div class="content">
+              <p>
+                一筆 MARC 或 OPAC 的書目紀錄，通常看起來像一個完整包裹。
+              </p>
+              <p>
+                知識圖譜則會問：包裹裡有哪些不同的東西？哪些是人？哪些是作品？哪些是版本？哪些只是描述值？
+              </p>
+
+              <h3 class="subtopic-title">例子：西遊記</h3>
+              <p>
+                西遊記是中國古典章回小說，敘述唐僧取經路上，孫悟空、豬八戒、沙悟淨等角色同行降妖除魔的故事。它有多種版本、改寫本、譯本等等。如果只看一筆書目紀錄，我們可能看到的是題名、作者、出版者、年代與主題。換成知識圖譜的眼光，這些欄位會被看成一組可以連起來的知識陳述。
+              </p>
+
+              <div class="example-map" aria-label="西遊記知識圖譜關係範例">
+                <div class="relation-row">
+                  <div class="node">西遊記</div>
+                  <div class="edge">有作者</div>
+                  <div class="node">吳承恩</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">西遊記</div>
+                  <div class="edge">有主題</div>
+                  <div class="node">中國古典小說</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">某一版本的西遊記</div>
+                  <div class="edge">具體呈現</div>
+                  <div class="node">某出版社 2020 年版</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">某出版社 2020 年版</div>
+                  <div class="edge">有館藏單件</div>
+                  <div class="node">本館條碼 A001</div>
+                </div>
+              </div>
+
+              <div class="attribute-map" aria-label="西遊記屬性範例">
+                <div class="attribute-row">
+                  <div class="node">某出版社 2020 年版</div>
+                  <div class="attribute-key">出版年</div>
+                  <div class="attribute-value">2020</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">某出版社 2020 年版</div>
+                  <div class="attribute-key">語言</div>
+                  <div class="attribute-value">中文</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">本館條碼 A001</div>
+                  <div class="attribute-key">館藏位置</div>
+                  <div class="attribute-value">總館書庫</div>
+                </div>
+              </div>
+
+              <p>
+                這樣做看起來是把一筆紀錄切得更零碎，但因為實體之間的關係被建立起來，不同紀錄中的人物、作品、版本與單件就可以彼此串接，形成一個更大的查詢網。使用者不只查到一筆紀錄，也能沿著關係找到同一作者的其他作品、同一作品的不同版本，以及某個版本在館內的不同單件。
+              </p>
+
+              <ul class="record-examples" aria-label="書目資料轉成知識圖譜角色的例子">
+                <li class="record-example">
+                  <div class="record-example-heading">
+                    <code>吳承恩</code>
+                    <span class="record-role">人物實體</span>
+                  </div>
+                  <p class="record-task">確認名稱指向哪一個人，並讓使用者能找到吳承恩的其他作品。</p>
+                  <figure class="record-relation-figure" aria-label="吳承恩連到多部作品的關係圖">
+                    <svg viewBox="0 0 760 360" role="img" aria-labelledby="wuchengen-title wuchengen-desc">
+                      <title id="wuchengen-title">吳承恩與作品</title>
+                      <desc id="wuchengen-desc">吳承恩作為人物實體，透過創作關係連到禹鼎記、西遊記、花草新編與二郎搜山圖歌。</desc>
+                      <defs>
+                        <marker id="author-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                        </marker>
+                      </defs>
+                      <rect x="42" y="145" width="150" height="70" rx="8" class="relation-source"></rect>
+                      <text x="117" y="174" text-anchor="middle" class="relation-mini-label">吳承恩</text>
+                      <text x="117" y="199" text-anchor="middle" class="relation-mini-note">人物實體</text>
+
+                      <line x1="198" y1="180" x2="392" y2="64" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="142" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="220" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <line x1="198" y1="180" x2="392" y2="298" class="relation-link" marker-end="url(#author-arrow)"></line>
+                      <text x="284" y="166" text-anchor="middle" class="relation-mini-note">創作</text>
+
+                      <rect x="400" y="30" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="64" text-anchor="middle" class="relation-mini-label">《禹鼎記》</text>
+                      <rect x="400" y="108" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="142" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="400" y="186" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="220" text-anchor="middle" class="relation-mini-label">《花草新編》</text>
+                      <rect x="400" y="264" width="230" height="54" rx="8" class="relation-target"></rect>
+                      <text x="515" y="298" text-anchor="middle" class="relation-mini-label">《二郎搜山圖歌》</text>
+                    </svg>
+                  </figure>
+                </li>
+                <li class="record-example">
+                  <div class="record-example-heading">
+                    <code>西遊記</code>
+                    <span class="record-role">作品實體</span>
+                  </div>
+                  <p class="record-task">把作品本身和不同版本、譯本、改寫本、改編本串接起來。</p>
+                  <figure class="record-relation-figure" aria-label="西遊記連到不同語文版本的關係圖">
+                    <svg viewBox="0 0 760 420" role="img" aria-labelledby="xiyouji-title xiyouji-desc">
+                      <title id="xiyouji-title">西遊記與語文版本</title>
+                      <desc id="xiyouji-desc">西遊記作為作品實體，連到繁中、簡中、日文、韓文與英文的常見書名。</desc>
+                      <defs>
+                        <marker id="version-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a8c7b"></path>
+                        </marker>
+                      </defs>
+                      <rect x="42" y="175" width="150" height="70" rx="8" class="relation-source"></rect>
+                      <text x="117" y="204" text-anchor="middle" class="relation-mini-label">西遊記</text>
+                      <text x="117" y="229" text-anchor="middle" class="relation-mini-note">作品實體</text>
+
+                      <line x1="198" y1="210" x2="372" y2="54" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="132" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="210" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="288" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <line x1="198" y1="210" x2="372" y2="366" class="relation-link" marker-end="url(#version-arrow)"></line>
+                      <text x="284" y="196" text-anchor="middle" class="relation-mini-note">有語文版本</text>
+
+                      <rect x="380" y="20" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="54" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="380" y="98" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="132" text-anchor="middle" class="relation-mini-label">《西游记》</text>
+                      <rect x="380" y="176" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="210" text-anchor="middle" class="relation-mini-label">《西遊記》</text>
+                      <rect x="380" y="254" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="288" text-anchor="middle" class="relation-mini-label">《서유기》</text>
+                      <rect x="380" y="332" width="310" height="54" rx="8" class="relation-target"></rect>
+                      <text x="535" y="366" text-anchor="middle" class="relation-mini-label">Journey to the West</text>
+                    </svg>
+                  </figure>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="subject-entity" aria-labelledby="subject-title">
+          <div class="section-heading">
+            <h2 id="subject-title">主題概念也可以是實體</h2>
+            <div class="content">
+              <p>
+                主題不一定只是文字標籤。在知識圖譜中，主題概念也可以成為實體。只要一個概念能被穩定辨識，並能和其他資料建立關係，它就可以在知識圖譜中被視為實體。所以，雖然中國古典小說不是一本實際存在的書，也不是一個人或一件館藏，但它仍然是一個可以被明確指認、命名和維護的概念。
+              </p>
+
+              <div class="example-map" aria-label="主題概念作為實體的知識圖譜範例">
+                <div class="relation-row">
+                  <div class="node">西遊記</div>
+                  <div class="edge">有主題</div>
+                  <div class="node">中國古典小說</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">三國演義</div>
+                </div>
+              </div>
+
+              <p>
+                因為中國古典小說能被當成實體，它也可以像人物、作品或館藏單件一樣擁有屬性。這些屬性不是在描述某一本書，而是在描述這個主題概念本身，例如它屬於哪一種類型、主要使用哪一種語言，或是否對應到某個分類號、主題詞表編號或外部知識庫識別碼。
+              </p>
+
+              <div class="attribute-map" aria-label="主題概念屬性範例">
+                <div class="attribute-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="attribute-key">類型</div>
+                  <div class="attribute-value">主題概念</div>
+                </div>
+                <div class="attribute-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="attribute-key">語言</div>
+                  <div class="attribute-value">中文</div>
+                </div>
+              </div>
+
+              <p>
+                把主題概念視為實體的用處，是讓主題不只停留在紀錄裡的一串文字，而能成為連結資料的節點。因為它能和許多作品、分類系統、相關主題或外部知識庫連在一起。這樣一來，使用者查詢某個主題時，不只會找到包含相同文字的紀錄，也能找到被同一主題概念連接起來的資源。
+              </p>
+
+              <div class="example-map" aria-label="使用主題概念串接不同作品的範例">
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">西遊記</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">三國演義</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">水滸傳</div>
+                </div>
+                <div class="relation-row">
+                  <div class="node">中國古典小說</div>
+                  <div class="edge">有作品</div>
+                  <div class="node">紅樓夢</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="kg-library-use" aria-labelledby="kg-use-title">
+          <div class="section-heading">
+            <h2 id="kg-use-title">知識圖譜對圖書館有什麼用？</h2>
+            <div class="content">
+              <p>
+                知識圖譜不是單純把資料畫成一張漂亮的圖，而是把知識拆成許多可以被辨識、連結與重複使用的單位。例如，Jane Austen 是一個人，Pride and Prejudice 是一部作品，marriage 是一個主題；Jane Austen 寫了 Pride and Prejudice，Pride and Prejudice 涉及 marriage 這個主題，則是它們之間的關係。
+              </p>
+              <figure class="source-figure kg-example-figure">
+                <div class="image-crop">
+                  <img src="./assets/jane-austen-knowledge-graph.png" alt="Jane Austen、Pride and Prejudice 與 marriage 三個節點，以及 wrote 和 theme 兩個關係的知識圖譜示意。">
+                </div>
+                <figcaption>
+                  圖 1：以 Jane Austen、Pride and Prejudice 與 marriage 為例，人物、作品與主題可以被視為不同實體，並透過「寫作」與「主題」等關係連結起來。
+                </figcaption>
+              </figure>
+              <p>
+                換句話說，知識圖譜的重點不只是存資料，而是讓資料之間的關係變得清楚。當資料之間的關係被明確表示出來後，系統不只可以回答有哪些資料符合關鍵字，也可以進一步回答這些資料彼此有什麼關係、可以從這筆資料連到哪些相關資料，以及某個人、作品、主題、事件之間形成了什麼脈絡。這正是知識圖譜最重要的價值。
+              </p>
+
+              <h3 class="subtopic-title">從找紀錄走向探索知識關係</h3>
+              <p>
+                對圖書館來說，知識圖譜有明確的意義。傳統書目資料通常以一筆紀錄為中心，記錄題名、作者、出版年、出版社、主題詞與 ISBN 等欄位。這種方式很適合已知項目查找，像是：當使用者知道書名、作者或明確關鍵字時，可以快速找到對應館藏。
+              </p>
+              <div class="query-compare" aria-label="傳統檢索與知識圖譜檢索的提問差異">
+                <div class="query-item">
+                  <strong>傳統檢索</strong>
+                  <p>資料庫裡有哪些紀錄符合我的查詢？</p>
+                </div>
+                <div class="query-item">
+                  <strong>知識圖譜支援的檢索</strong>
+                  <p>這個知識對象和哪些人、作品、主題、版本、事件、機構有關？</p>
+                </div>
+              </div>
+              <p>
+                但探索性的問題常常不是從精確關鍵字開始。例如使用者想找和女性成長、婚姻制度、十九世紀英國社會有關的小說，未必知道該輸入哪些詞。即使館藏中有相關作品，也可能因為用詞不同、主題標示不一致，或紀錄之間的關係沒有被清楚呈現，而不容易被發現。
+              </p>
+              <p>
+                知識圖譜可以把作品、作者、譯者、版本、館藏單件、主題、時代與地點視為不同實體，並用關係連接起來。使用者查到一本書時，系統就不只呈現這本書的書目資料，也能引導他看見相關作品、不同版本、同一主題的其他資源、同一作者的作品網絡，甚至連到外部資料庫或數位典藏。
+              </p>
+              <h3 class="subtopic-title">補足檢索，走向探索</h3>
+              <p>
+                知識圖譜是要補足傳統檢索較弱的部分，以關係導向的探索、實體辨識與整合跨資料來源，協助系統辨識同一作者的不同名稱形式，減少同名異人或異名同人的混淆，也可以把館藏目錄、數位典藏、機構典藏、期刊論文、學位論文、人物權威檔與主題詞表串接起來。知識圖譜讓圖書館服務不只停留在查找館藏，而是進一步走向知識探索，並延伸圖書館原本擅長的編目、分類、主題分析與權威控制工作。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="try-it" aria-labelledby="discussion-title">
+          <div class="section-heading">
+            <h2 id="discussion-title">小練習</h2>
+            <div class="content">
+              <ol>
+                <li>選一筆你熟悉的書目紀錄，圈出其中可能成為實體的內容。</li>
+                <li>為其中兩個實體寫出一個關係，例如某作品與某作者之間的關係。</li>
+                <li>判斷哪些資訊只是屬性，例如出版年、頁數、語言或 ISBN。</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./index.html">
+            <span class="pager-label">章首頁</span>
+            <span class="pager-title">05 Knowledge Graph</span>
+            <span class="pager-note">回到本章目次，查看已撰寫的 Section。</span>
+          </a>
+          <a class="pager-link" href="./section-02.html">
+            <span class="pager-label">下一節</span>
+            <span class="pager-title">02 為什麼 Gen AI 下還需要知識圖譜？</span>
+            <span class="pager-note">從 Gen AI 的強項與限制，理解知識圖譜補上的結構、關係與可查證性。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 知識圖譜｜資訊組識課程庫
+      </footer>
+    </div>
+  </body>
+</html>

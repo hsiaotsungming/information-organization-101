@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>02 為什麼 Gen AI 下還需要知識圖譜？｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .chapter-nav,
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-nav a,
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .chapter-nav a[aria-current="page"],
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6.2vw, 5.8rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 8px 0 10px;
+        color: var(--ink);
+        font-size: clamp(1.4rem, 2vw, 1.75rem);
+        line-height: 1.3;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        color: var(--muted);
+        font-size: clamp(1.2rem, 1.6vw, 1.48rem);
+        line-height: 1.72;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .statement,
+      .note-panel {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .note-panel {
+        border-left-color: var(--orange);
+        background: var(--warm);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+      }
+
+      th,
+      td {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--ink);
+        background: var(--soft);
+        font-weight: 800;
+      }
+
+      .scenario {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .query {
+        padding: 18px 20px;
+        border-left: 5px solid var(--accent);
+        background: #f4f8fb;
+        color: var(--ink);
+        font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+        line-height: 1.65;
+      }
+
+      .entity-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .entity-item {
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .entity-item strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--accent);
+        font-size: 1rem;
+      }
+
+      .entity-item span {
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.55;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-top: 10px;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        min-height: 120px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-link:hover {
+        border-color: #b8c7d6;
+        box-shadow: 0 14px 32px rgba(23, 35, 51, 0.06);
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .entity-grid,
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">回到課程首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Section 02</span>
+          <h1 id="page-title">為什麼 Gen AI 下還需要知識圖譜？</h1>
+          <p class="lede">
+            大型語言模型讓我們更容易用自然語言接近知識，但資訊組織關心的不只是能不能產生答案，而是答案背後的資料是否能被辨識、連結、查證與維護。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="本節小節導覽">
+          <a href="#opening" aria-current="page">1. 直覺問題</a>
+          <a href="#limits">2. Gen AI 的限制</a>
+          <a href="#structure">3. 圖譜補上的結構</a>
+          <a href="#division">4. 兩者分工</a>
+          <a href="#library-view">5. 資訊組織觀點</a>
+          <a href="#scenario">6. 具體場景</a>
+        </nav>
+
+        <section class="section" id="opening" aria-labelledby="opening-title">
+          <div class="section-heading">
+            <h2 id="opening-title">直覺問題</h2>
+            <div class="content">
+              <p class="statement">
+                既然大型語言模型已經可以回答問題、摘要、翻譯、改寫，為什麼還需要知識圖譜？
+              </p>
+              <p>
+                這是一個很自然的問題。Gen AI 的確很擅長把資料轉成可讀的文字，也能用對話方式協助使用者探索主題。不過，能產生一段流暢回答，並不等於系統已經穩定地組織、管理與查證了那些知識。
+              </p>
+              <p>
+                上一節先看了知識圖譜的基本構成：實體、關係與屬性。這一節接著問，在 Gen AI 可以產生自然語言回答的時代，為什麼仍然需要這種結構化的知識組織？
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="limits" aria-labelledby="limits-title">
+          <div class="section-heading">
+            <h2 id="limits-title">Gen AI 的限制</h2>
+            <div class="content">
+              <p>
+                大型語言模型擅長的是語言生成與語意推測，不等於它本身就是可靠、可維護、可追溯的知識庫。它能根據語境生成看似合理的回答，但回答中的概念、來源與關係不一定被明確記錄下來。
+              </p>
+              <ul>
+                <li>它可能把相似名稱、相近概念或不同版本混在一起。</li>
+                <li>它很會組織語句，但不一定能指出資料來源與推論路徑。</li>
+                <li>同一個問題在不同提示或不同時間，可能得到不同細節的回答。</li>
+                <li>它可以產生答案，但答案是否能被資料系統長期維護，是另一個問題。</li>
+              </ul>
+              <p class="note-panel">
+                Gen AI 讓知識更容易被說出來，但不保證知識已經被正確組織起來。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="structure" aria-labelledby="structure-title">
+          <div class="section-heading">
+            <h2 id="structure-title">圖譜補上的結構</h2>
+            <div class="content">
+              <p>
+                知識圖譜補上的不是生成能力，而是結構能力。它把知識整理成可以被系統辨識、連結、查詢與更新的形式，讓資料不只是文字片段，而是有明確身分與關係的知識網絡。
+              </p>
+              <ul>
+                <li>實體讓 Jane Austen、Pride and Prejudice、marriage 不是只靠文字相似，而是可辨識的對象。</li>
+                <li>關係讓系統知道誰寫了什麼、作品談什麼主題、版本與譯本如何相連。</li>
+                <li>屬性讓年代、身分、語言、出版資訊、館藏位置等資料有穩定欄位。</li>
+                <li>來源讓回答可以回到資料根據，而不只是生成一段漂亮文字。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="division" aria-labelledby="division-title">
+          <div class="section-heading">
+            <h2 id="division-title">兩者分工</h2>
+            <div class="content">
+              <table>
+                <thead>
+                  <tr>
+                    <th>問題</th>
+                    <th>Gen AI 擅長</th>
+                    <th>Knowledge Graph 擅長</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>使用者用自然語言提問</td>
+                    <td>理解語意、改寫問題、補足語境</td>
+                    <td>對應到明確的實體與關係</td>
+                  </tr>
+                  <tr>
+                    <td>需要產生答案</td>
+                    <td>生成可讀、連貫、符合情境的說明</td>
+                    <td>提供可查證的資料節點與連結</td>
+                  </tr>
+                  <tr>
+                    <td>名稱與概念容易混淆</td>
+                    <td>找出可能相關的語意範圍</td>
+                    <td>消歧義，建立權威控制與穩定識別</td>
+                  </tr>
+                  <tr>
+                    <td>需要解釋原因或脈絡</td>
+                    <td>把結果組織成敘述</td>
+                    <td>提供關係路徑與推理基礎</td>
+                  </tr>
+                  <tr>
+                    <td>資料需要持續更新</td>
+                    <td>可能受訓練資料與提示限制</td>
+                    <td>可維護、可版本化、可連到來源</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="library-view" aria-labelledby="library-title">
+          <div class="section-heading">
+            <h2 id="library-title">資訊組織觀點</h2>
+            <div class="content">
+              <p>
+                從圖書館與資訊組織的角度來看，重點從來不只是保存資料，而是讓資料可以被發現、辨識、連結與解釋。Gen AI 讓使用者更容易發問，也讓系統更容易產生回應；但越是如此，資料是否可靠、概念是否清楚、來源是否可追溯就越重要。
+              </p>
+              <p>
+                使用者入口正在從關鍵字檢索轉向自然語言對話。這不代表編目、權威控制、主題分析與資料模型不再重要，而是它們更可能退到回答背後，成為支撐 AI 回應品質的知識基礎。
+              </p>
+              <p class="statement">
+                Gen AI 讓人更容易用自然語言接近知識；知識圖譜讓系統有能力把知識辨識、連結、查證與維護。兩者不是替代關係，而是互補關係。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="scenario" aria-labelledby="scenario-title">
+          <div class="section-heading">
+            <h2 id="scenario-title">具體場景</h2>
+            <div class="content">
+              <div class="scenario">
+                <p class="query">
+                  我想找 Jane Austen 作品中和婚姻主題有關的中文譯本。
+                </p>
+                <p>
+                  Gen AI 可以把這個問題理解成自然語言需求，也能把查到的資料整理成容易閱讀的回答。知識圖譜則可以把問題拆成可查詢、可驗證的結構。
+                </p>
+                <div class="entity-grid">
+                  <div class="entity-item">
+                    <strong>人物</strong>
+                    <span>Jane Austen</span>
+                  </div>
+                  <div class="entity-item">
+                    <strong>作品</strong>
+                    <span>Pride and Prejudice 等作品</span>
+                  </div>
+                  <div class="entity-item">
+                    <strong>主題</strong>
+                    <span>marriage</span>
+                  </div>
+                  <div class="entity-item">
+                    <strong>語言與版本</strong>
+                    <span>中文譯本、不同版本、不同館藏</span>
+                  </div>
+                </div>
+                <p>
+                  這種分工讓回答不只是一段文字，而是可以回到作者、作品、主題、譯本與館藏資料的連結路徑。對資訊組織而言，這正是知識圖譜在 Gen AI 時代的重要性。
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./section-01.html">
+            <span class="pager-label">上一節</span>
+            <span class="pager-title">01 什麼是 Knowledge Graph？</span>
+            <span class="pager-note">回看知識圖譜的基本構成：實體、關係與屬性。</span>
+          </a>
+          <a class="pager-link" href="./index.html">
+            <span class="pager-label">章首頁</span>
+            <span class="pager-title">05 Knowledge Graph</span>
+            <span class="pager-note">回到本章目次，查看已撰寫的 Section。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Section 02
+      </footer>
+    </div>
+  </body>
+</html>
