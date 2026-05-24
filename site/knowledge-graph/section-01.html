@@ -428,6 +428,25 @@
         background: #ffffff;
       }
 
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        max-width: 760px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .image-crop .image-zoom-button {
+        max-width: none;
+      }
+
       .source-figure figcaption {
         max-width: 760px;
         color: var(--muted);
@@ -457,6 +476,58 @@
         border: 0;
         border-radius: 0;
         transform: translateY(-25%);
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(23, 35, 51, 0.18);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 3px;
       }
 
       .query-compare {
@@ -1054,7 +1125,9 @@
               </article>
 
               <figure class="source-figure">
-                <img src="./assets/catalog-record-example.jpg" alt="傳統圖書館書目紀錄範例，包含分類號、題名、作者、出版項、稽核項、叢書項、ISBN 與館藏系統號等資訊。">
+                <button class="image-zoom-button" type="button" aria-label="放大檢視中文編目的卡片目錄" data-image-modal-open data-modal-src="./assets/catalog-record-example.jpg" data-modal-alt="傳統圖書館書目紀錄範例，包含分類號、題名、作者、出版項、稽核項、叢書項、ISBN 與館藏系統號等資訊。">
+                  <img src="./assets/catalog-record-example.jpg" alt="傳統圖書館書目紀錄範例，包含分類號、題名、作者、出版項、稽核項、叢書項、ISBN 與館藏系統號等資訊。">
+                </button>
                 <figcaption>
                   中文編目的卡片目錄。<br>
                   圖片來源：國家圖書館，圖書資料編目與書目資源，<a href="https://catweb.ncl.edu.tw/sites/default/files/upload/training/02_%E5%9C%96%E6%9B%B8%E8%B3%87%E6%96%99%E7%B7%A8%E7%9B%AE%E8%88%87%E6%9B%B8%E7%9B%AE%E8%B3%87%E6%BA%90.pdf">原始 PDF</a>
@@ -1364,7 +1437,9 @@
               </p>
               <figure class="source-figure kg-example-figure">
                 <div class="image-crop">
-                  <img src="./assets/jane-austen-knowledge-graph.png" alt="Jane Austen、Pride and Prejudice 與 marriage 三個節點，以及 wrote 和 theme 兩個關係的知識圖譜示意。">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視 Jane Austen 知識圖譜示意" data-image-modal-open data-modal-src="./assets/jane-austen-knowledge-graph.png" data-modal-alt="Jane Austen、Pride and Prejudice 與 marriage 三個節點，以及 wrote 和 theme 兩個關係的知識圖譜示意。">
+                    <img src="./assets/jane-austen-knowledge-graph.png" alt="Jane Austen、Pride and Prejudice 與 marriage 三個節點，以及 wrote 和 theme 兩個關係的知識圖譜示意。">
+                  </button>
                 </div>
                 <figcaption>
                   圖 1：以 Jane Austen、Pride and Prejudice 與 marriage 為例，人物、作品與主題可以被視為不同實體，並透過「寫作」與「主題」等關係連結起來。
@@ -1432,5 +1507,52 @@
         05 知識圖譜｜資訊組識課程庫
       </footer>
     </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt || "";
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+      closeModalButton.addEventListener("click", closeImageModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
   </body>
 </html>

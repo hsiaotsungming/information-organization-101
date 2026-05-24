@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>02 為什麼 Gen AI 下還需要知識圖譜？｜05 Knowledge Graph</title>
+    <title>02 為什麼生成式AI下還需要知識圖譜？｜05 Knowledge Graph</title>
     <style>
       :root {
         color-scheme: light;
@@ -207,6 +207,250 @@
         background: var(--warm);
       }
 
+      .generation-figure {
+        margin: 4px 0 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .generation-figure .image-crop {
+        width: 100%;
+        aspect-ratio: 1672 / 565;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .generation-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+        transform: translateY(-20%);
+      }
+
+      .generation-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .limit-figure {
+        display: grid;
+        gap: 12px;
+        margin: 4px 0 0;
+      }
+
+      .limit-figure .image-frame {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .limit-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+      }
+
+      .limit-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .strength-cards {
+        display: grid;
+        gap: 12px;
+      }
+
+      .strength-card {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr);
+        align-items: start;
+        gap: 10px;
+        padding: 20px 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .strength-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 1px solid rgba(31, 79, 120, 0.2);
+        border-radius: 8px;
+        color: var(--accent);
+        background: #f4f8fb;
+      }
+
+      .strength-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .strength-card h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+      }
+
+      .strength-card p {
+        font-size: clamp(1.08rem, 1.35vw, 1.22rem);
+        line-height: 1.68;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .comparison-panel {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .comparison-panel-heading {
+        display: grid;
+        gap: 6px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .comparison-panel-heading h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(1.45rem, 2vw, 1.85rem);
+        line-height: 1.5;
+      }
+
+      .comparison-panel-heading p {
+        color: var(--muted);
+        font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+        line-height: 1.6;
+      }
+
+      .comparison-points {
+        display: grid;
+        gap: 12px;
+      }
+
+      .comparison-point {
+        display: grid;
+        gap: 6px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .comparison-point h4 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.16rem, 1.5vw, 1.35rem);
+        line-height: 1.4;
+      }
+
+      .comparison-panel:first-child .comparison-point h4 {
+        color: var(--green);
+      }
+
+      .comparison-point p {
+        font-size: clamp(1.18rem, 1.55vw, 1.38rem);
+        line-height: 1.68;
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(23, 35, 51, 0.18);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 3px;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
@@ -346,6 +590,14 @@
           grid-template-columns: 1fr;
         }
 
+        .strength-card {
+          grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
         th,
         td {
           display: block;
@@ -366,53 +618,86 @@
       <main>
         <section class="hero" aria-labelledby="page-title">
           <span class="eyebrow">05 Knowledge Graph｜Section 02</span>
-          <h1 id="page-title">為什麼 Gen AI 下還需要知識圖譜？</h1>
+          <h1 id="page-title">為什麼生成式AI下還需要知識圖譜？</h1>
           <p class="lede">
-            大型語言模型讓我們更容易用自然語言接近知識，但資訊組織關心的不只是能不能產生答案，而是答案背後的資料是否能被辨識、連結、查證與維護。
+            大型語言模型讓我們更容易用自然語言接近知識，但資訊組織需要提供與維護可被辨識、查證的知識。
           </p>
         </section>
 
         <nav class="unit-nav" aria-label="本節小節導覽">
-          <a href="#opening" aria-current="page">1. 直覺問題</a>
-          <a href="#limits">2. Gen AI 的限制</a>
-          <a href="#structure">3. 圖譜補上的結構</a>
-          <a href="#division">4. 兩者分工</a>
-          <a href="#library-view">5. 資訊組織觀點</a>
-          <a href="#scenario">6. 具體場景</a>
+          <a href="#opening" aria-current="page">1. 生成式AI回答的本質</a>
+          <a href="#structure">2. 知識圖譜的強項</a>
+          <a href="#division">3. 兩種方法的強弱項目</a>
+          <a href="#library-view">4. 資訊組織的角色</a>
+          <a href="#scenario">5. 檢索上的結合應用</a>
+          <a href="#practice">6. 小練習</a>
         </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>分辨生成式AI與知識圖譜的知識處理方式。</li>
+                <li>理解大型語言模型產生答案時的限制。</li>
+                <li>說明知識圖譜如何補足大型語言模型的限制。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
         <section class="section" id="opening" aria-labelledby="opening-title">
           <div class="section-heading">
-            <h2 id="opening-title">直覺問題</h2>
+            <h2 id="opening-title">生成式AI回答的本質</h2>
             <div class="content">
               <p class="statement">
                 既然大型語言模型已經可以回答問題、摘要、翻譯、改寫，為什麼還需要知識圖譜？
               </p>
               <p>
-                這是一個很自然的問題。Gen AI 的確很擅長把資料轉成可讀的文字，也能用對話方式協助使用者探索主題。不過，能產生一段流暢回答，並不等於系統已經穩定地組織、管理與查證了那些知識。
+                生成式AI的回答，本質上像是在接續一段文字。它會根據使用者的問題、前後文，以及模型在大量文本中學到的語言模式，推估接下來最可能出現、最符合語境的字詞，逐步組合成一段看起來通順、貼近問題的回答。但是，產生回答和組織知識是不同的工作。
+              </p>
+              <figure class="generation-figure">
+                <div class="image-crop">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視大型語言模型訓練流程圖" data-image-modal-open data-modal-src="./assets/llm-training-process.png" data-modal-alt="大型語言模型訓練流程圖，說明模型從蒐集大量文本資料、整理與切分、讀取與學習、反覆訓練，到形成生成與理解文字能力的過程。">
+                    <img src="./assets/llm-training-process.png" alt="大型語言模型訓練流程圖，說明模型從蒐集大量文本資料、整理與切分、讀取與學習、反覆訓練，到形成生成與理解文字能力的過程。">
+                  </button>
+                </div>
+                <figcaption>
+                  大型語言模型從大量文本中反覆學習語言規律，形成生成與理解文字的能力。
+                </figcaption>
+              </figure>
+              <figure class="generation-figure">
+                <div class="image-crop">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視大型語言模型回答問題流程圖" data-image-modal-open data-modal-src="./assets/llm-answer-process.png" data-modal-alt="大型語言模型回答問題的流程圖，從使用者輸入與前後文開始，經由大型語言模型推估下一個字詞、逐步接續，最後形成通順連貫的回答。">
+                    <img src="./assets/llm-answer-process.png" alt="大型語言模型回答問題的流程圖，從使用者輸入與前後文開始，經由大型語言模型推估下一個字詞、逐步接續，最後形成通順連貫的回答。">
+                  </button>
+                </div>
+                <figcaption>
+                  大型語言模型依據輸入脈絡逐步推估字詞，最後形成回答。
+                </figcaption>
+              </figure>
+              <h3>生成式AI的限制</h3>
+              <p>
+                大型語言模型擅長語言生成與語意推測，不等於它本身就是可靠、可維護、可追溯的知識庫。雖然它能根據語境，來生成可能合理的回答，但回答中的概念、來源與關係，並不一定能是準確的。
+              </p>
+              <figure class="limit-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視生成式AI限制示意圖" data-image-modal-open data-modal-src="./assets/llm-limitations.png" data-modal-alt="生成式AI回答限制示意圖，左側說明模型可能混合作品、譯本、版本與改編作品等不同書目層級，右側說明回答來源可能不清楚。">
+                    <img src="./assets/llm-limitations.png" alt="生成式AI回答限制示意圖，左側說明模型可能混合作品、譯本、版本與改編作品等不同書目層級，右側說明回答來源可能不清楚。">
+                  </button>
+                </div>
+                <figcaption>
+                  生成式AI回答可能混合不同書目層級，也可能缺少可追溯的來源與推論路徑。
+                </figcaption>
+              </figure>
+              <p>
+                例如，當我們問某位作家有哪些作品時，模型可能列出一串看似合理的書名。但如果其中牽涉筆名、譯名、不同版本、改編作品，模型就可能把不同層次的資料混在一起。以圖書館資料來說，「作品」、「譯本」、「版本」、「改編作品」其實不是同一件事，但生成式AI在回答時，不一定會嚴格區分這些差異。
               </p>
               <p>
-                上一節先看了知識圖譜的基本構成：實體、關係與屬性。這一節接著問，在 Gen AI 可以產生自然語言回答的時代，為什麼仍然需要這種結構化的知識組織？
+                另一個問題是來源與推論路徑不夠清楚。模型可能回答「這本書和女性成長、婚姻制度有關」，但不一定能說明這個判斷來自哪個主題詞、哪段摘要、哪筆書目資料。它很會組織語句，但不一定能讓使用者追溯「這個答案從哪裡來」。
               </p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="limits" aria-labelledby="limits-title">
-          <div class="section-heading">
-            <h2 id="limits-title">Gen AI 的限制</h2>
-            <div class="content">
               <p>
-                大型語言模型擅長的是語言生成與語意推測，不等於它本身就是可靠、可維護、可追溯的知識庫。它能根據語境生成看似合理的回答，但回答中的概念、來源與關係不一定被明確記錄下來。
-              </p>
-              <ul>
-                <li>它可能把相似名稱、相近概念或不同版本混在一起。</li>
-                <li>它很會組織語句，但不一定能指出資料來源與推論路徑。</li>
-                <li>同一個問題在不同提示或不同時間，可能得到不同細節的回答。</li>
-                <li>它可以產生答案，但答案是否能被資料系統長期維護，是另一個問題。</li>
-              </ul>
-              <p class="note-panel">
-                Gen AI 讓知識更容易被說出來，但不保證知識已經被正確組織起來。
+                這不是說模型沒有用，而是表示它的回答本質上是一段即時生成的文字，不會是穩定而可檢查、更新的紀錄。對圖書館或知識組織工作而言，這會造成維護上的困難。生成式AI可以產生答案，但答案是否有清楚來源、是否能被驗證、是否能被長期維護，需要依靠其它技術來協助。
               </p>
             </div>
           </div>
@@ -420,77 +705,280 @@
 
         <section class="section" id="structure" aria-labelledby="structure-title">
           <div class="section-heading">
-            <h2 id="structure-title">圖譜補上的結構</h2>
+            <h2 id="structure-title">知識圖譜的強項</h2>
             <div class="content">
               <p>
-                知識圖譜補上的不是生成能力，而是結構能力。它把知識整理成可以被系統辨識、連結、查詢與更新的形式，讓資料不只是文字片段，而是有明確身分與關係的知識網絡。
+                知識圖譜補上的不是生成能力，而是結構能力。生成式AI可以根據語境產生流暢回答，但回答中的實體、來源與關係不一定清楚，也不一定容易驗證。知識圖譜則將知識整理成可以被系統辨識、連結、查詢與更新的形式，讓資料有明確身分之外，也讓資料之間的關係被清楚記錄。因此，資料不再只是分散的文字片段，而是形成可以檢查與維護的知識網絡。例如：
               </p>
-              <ul>
-                <li>實體讓 Jane Austen、Pride and Prejudice、marriage 不是只靠文字相似，而是可辨識的對象。</li>
-                <li>關係讓系統知道誰寫了什麼、作品談什麼主題、版本與譯本如何相連。</li>
-                <li>屬性讓年代、身分、語言、出版資訊、館藏位置等資料有穩定欄位。</li>
-                <li>來源讓回答可以回到資料根據，而不只是生成一段漂亮文字。</li>
-              </ul>
+              <div class="strength-cards" aria-label="知識圖譜的三個結構能力">
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"></path>
+                      <path d="M8 4v16"></path>
+                      <path d="M11 9h5"></path>
+                      <path d="M11 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>實體</h3>
+                    <p>
+                      實體讓系統能辨識知識中的對象。例如 Jane Austen 是一位作者，Pride and Prejudice 是一部作品，marriage 是一個主題。實體可以讓系統知道，這些字串各自代表的知識單位。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"></path>
+                      <path d="M8 4v16"></path>
+                      <path d="M11 9h5"></path>
+                      <path d="M11 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>關係</h3>
+                    <p>
+                      關係讓系統能表示這些實體之間如何相連。例如 Jane Austen 寫了 Pride and Prejudice，而 Pride and Prejudice 涉及 marriage 這個主題。透過關係，系統可以知道知識的脈絡。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h14v16H5z"></path>
+                      <path d="M8 8h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M8 16h5"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>屬性</h3>
+                    <p>
+                      屬性則補充每個實體本身的描述資訊。例如 Jane Austen 有出生年代與國籍，Pride and Prejudice 有出版年與語言。
+                    </p>
+                  </div>
+                </article>
+              </div>
+              <p>
+                以《The Da Vinci Code》為例，這個著作有多種不同的資料，像是作品、翻譯版本、實體書、作者、主題、畫作與畫家。這些資料各自有明確身分，也透過「由誰撰寫」、「關於什麼」、「由誰繪製」、「哪個圖書館持有」等關係連在一起。下面是一些由圖中可以辨識出來的實體、關係、屬性。而以知識圖譜呈現時，書目資料可以被系統清楚辨識、查詢與驗證。
+              </p>
+              <figure class="limit-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視 The Da Vinci Code 的書目資料知識圖譜" data-image-modal-open data-modal-src="./assets/lod-frbr-da-vinci-code.png" data-modal-alt="The Da Vinci Code 的書目資料知識圖譜，包含作品、翻譯版本、實體書、作者、主題、畫作、畫家、圖書館館藏與相關 URI。">
+                    <img src="./assets/lod-frbr-da-vinci-code.png" alt="The Da Vinci Code 的書目資料知識圖譜，包含作品、翻譯版本、實體書、作者、主題、畫作、畫家、圖書館館藏與相關 URI。">
+                  </button>
+                </div>
+                <figcaption>
+                  The Da Vinci Code 的書目資料關係圖示。<br>
+                  圖片來源：Commonplace，<a href="https://commonplace.net/2012/01/local-library-data-in-the-new-global-framework/">Local library data in the new global framework</a>
+                </figcaption>
+              </figure>
+              <div class="strength-cards" aria-label="The Da Vinci Code 知識圖譜中的實體關係屬性例子">
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="5" y="5" width="14" height="14" rx="3"></rect>
+                      <path d="M9 9h6"></path>
+                      <path d="M9 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>實體</h3>
+                    <p>
+                      The Da Vinci Code 是一個作品層級 Work 的實體。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="5" y="5" width="14" height="14" rx="3"></rect>
+                      <path d="M9 9h6"></path>
+                      <path d="M9 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>實體</h3>
+                    <p>
+                      這個著作有 Dutch translation 表現形式 Expression 的實體。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h14v16H5z"></path>
+                      <path d="M8 8h8"></path>
+                      <path d="M8 12h8"></path>
+                      <path d="M8 16h5"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>屬性</h3>
+                    <p>
+                      The Da Vinci Code 這個 Work 的 URI 是 http://openlibrary.org/works/OL76837W。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="12" r="3"></circle>
+                      <path d="M9 12h6"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>關係</h3>
+                    <p>
+                      The Da Vinci Code 由 Dan Brown 撰寫 written by。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="4" y="5" width="16" height="11" rx="2"></rect>
+                      <path d="M8 20h8"></path>
+                      <path d="M12 16v4"></path>
+                      <circle cx="9" cy="10.5" r="1.5"></circle>
+                      <circle cx="15" cy="10.5" r="1.5"></circle>
+                      <path d="M10.5 10.5h3"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>關係</h3>
+                    <p>
+                      圖書館持有 Holding 某一本書的館藏單件 Item。
+                    </p>
+                  </div>
+                </article>
+              </div>
+              <p>
+                所以，當生成式AI參考知識圖譜來回答問題時，可以依據已整理好的實體與關係生成答案。這有助於降低名稱混淆、關係誤判與細節編造的風險，也能補強生成式AI在可驗證性、可追溯性與知識維護上的不足。
+              </p>
             </div>
           </div>
         </section>
 
         <section class="section" id="division" aria-labelledby="division-title">
           <div class="section-heading">
-            <h2 id="division-title">兩者分工</h2>
+            <h2 id="division-title">兩種方法的強弱項目</h2>
             <div class="content">
-              <table>
-                <thead>
-                  <tr>
-                    <th>問題</th>
-                    <th>Gen AI 擅長</th>
-                    <th>Knowledge Graph 擅長</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>使用者用自然語言提問</td>
-                    <td>理解語意、改寫問題、補足語境</td>
-                    <td>對應到明確的實體與關係</td>
-                  </tr>
-                  <tr>
-                    <td>需要產生答案</td>
-                    <td>生成可讀、連貫、符合情境的說明</td>
-                    <td>提供可查證的資料節點與連結</td>
-                  </tr>
-                  <tr>
-                    <td>名稱與概念容易混淆</td>
-                    <td>找出可能相關的語意範圍</td>
-                    <td>消歧義，建立權威控制與穩定識別</td>
-                  </tr>
-                  <tr>
-                    <td>需要解釋原因或脈絡</td>
-                    <td>把結果組織成敘述</td>
-                    <td>提供關係路徑與推理基礎</td>
-                  </tr>
-                  <tr>
-                    <td>資料需要持續更新</td>
-                    <td>可能受訓練資料與提示限制</td>
-                    <td>可維護、可版本化、可連到來源</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="comparison-grid" aria-label="生成式AI與知識圖譜的強弱項目比較">
+                <article class="comparison-panel">
+                  <div class="comparison-panel-heading">
+                    <h3>生成式AI</h3>
+                    <p>強在語言理解與文字生成，但較難保證答案背後的資料結構、來源與維護狀態。</p>
+                  </div>
+                  <div class="comparison-points">
+                    <section class="comparison-point">
+                      <h4>自然語言與脈絡說明</h4>
+                      <p>能理解使用者用自然語言提出的問題，改寫需求、補足語境，並把結果組織成可讀的說明。</p>
+                    </section>
+                    <section class="comparison-point">
+                      <h4>產生答案</h4>
+                      <p>能快速生成連貫、貼近情境的文字，但答案中的細節不一定都有明確資料來源。</p>
+                    </section>
+                    <section class="comparison-point">
+                      <h4>資料更新</h4>
+                      <p>回答可能受訓練資料、提示方式與當下語境影響，不適合單獨作為長期維護的知識紀錄。</p>
+                    </section>
+                  </div>
+                </article>
+                <article class="comparison-panel">
+                  <div class="comparison-panel-heading">
+                    <h3>知識圖譜</h3>
+                    <p>強在結構化、可辨識與可追溯，能把答案連回穩定的實體、關係與資料來源。</p>
+                  </div>
+                  <div class="comparison-points">
+                    <section class="comparison-point">
+                      <h4>實體與關係對應</h4>
+                      <p>能把自然語言需求對應到明確的實體與關係，並提供關係路徑作為解釋基礎。</p>
+                    </section>
+                    <section class="comparison-point">
+                      <h4>消歧義與查證</h4>
+                      <p>能區分相似名稱、不同版本與不同資料層級，並提供可查證的資料節點與連結。</p>
+                    </section>
+                    <section class="comparison-point">
+                      <h4>資料維護</h4>
+                      <p>能支援資料更新、版本管理與來源追溯，讓知識可以被長期檢查與維護。</p>
+                    </section>
+                  </div>
+                </article>
+              </div>
             </div>
           </div>
         </section>
 
         <section class="section" id="library-view" aria-labelledby="library-title">
           <div class="section-heading">
-            <h2 id="library-title">資訊組織觀點</h2>
+            <h2 id="library-title">資訊組織的角色</h2>
             <div class="content">
               <p>
-                從圖書館與資訊組織的角度來看，重點從來不只是保存資料，而是讓資料可以被發現、辨識、連結與解釋。Gen AI 讓使用者更容易發問，也讓系統更容易產生回應；但越是如此，資料是否可靠、概念是否清楚、來源是否可追溯就越重要。
+                從資訊組織的角度來看，除了要保存資料之外，更要讓資料可以被發現、辨識、連結成脈絡，由此提供資訊。使用者從關鍵字檢索轉向自然語言或生成式檢索，這不代表編目、權威控制、主題分析與資料模型不再重要，而是它們更可能退到回答背後，成為支撐 AI 回應品質的知識基礎。
               </p>
               <p>
-                使用者入口正在從關鍵字檢索轉向自然語言對話。這不代表編目、權威控制、主題分析與資料模型不再重要，而是它們更可能退到回答背後，成為支撐 AI 回應品質的知識基礎。
+                圖書館實務上，BIBFRAME、IFLA LRM、VIAF，以及臺灣國家圖書館與臺大合作的 LDT@Library，都可視為把敘述編目與主題編目的內容，轉成可連結知識圖譜的概念。
               </p>
-              <p class="statement">
-                Gen AI 讓人更容易用自然語言接近知識；知識圖譜讓系統有能力把知識辨識、連結、查證與維護。兩者不是替代關係，而是互補關係。
+              <div class="strength-cards" aria-label="資訊組織與 linked data 相關模型和計畫">
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"></path>
+                      <path d="M8 4v16"></path>
+                      <path d="M11 9h5"></path>
+                      <path d="M11 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>BIBFRAME</h3>
+                    <p>
+                      BIBFRAME 是由美國 Library of Congress 推動的書目資料模型，目的在於讓圖書館書目資料更適合 linked data 環境。它將書目描述整理為 Work、Instance、Item 等核心層次，並以 RDF vocabulary 表示實體、屬性與關係，使書目資料能被識別為可連結的 Web resources。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"></path>
+                      <path d="M8 4v16"></path>
+                      <path d="M11 9h5"></path>
+                      <path d="M11 13h4"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>IFLA LRM</h3>
+                    <p>
+                      是整合 FRBR、FRAD 與 FRSAD 而形成的書目概念模型，用來統一描述書目資料中的資源、行動者與主題關係。它以 entity-relationship 架構呈現 bibliographic universe，並將 Work、Expression、Manifestation、Item 與 agent、subject、place、time-span 等實體納入同一模型。
+                    </p>
+                  </div>
+                </article>
+                <article class="strength-card">
+                  <span class="strength-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="4" y="5" width="16" height="11" rx="2"></rect>
+                      <path d="M8 20h8"></path>
+                      <path d="M12 16v4"></path>
+                      <circle cx="9" cy="10.5" r="1.5"></circle>
+                      <circle cx="15" cy="10.5" r="1.5"></circle>
+                      <path d="M10.5 10.5h3"></path>
+                    </svg>
+                  </span>
+                  <div>
+                    <h3>LDT @ Library</h3>
+                    <p>
+                      臺灣圖書館界推動 linked data 應用的合作計畫，背景在於國內部分圖書館自 2018 年起陸續導入支援 linked data 的系統，並開始轉向 RDA 編目規範。此計畫由國家圖書館與國立臺灣大學圖書館合作，整合權威、題名與主題資料，建置「臺灣鏈結資源系統」。
+                    </p>
+                  </div>
+                </article>
+              </div>
+              <p>
+                資訊組織的專業不只是整理資料，也是在整理資料的過程中建構知識。在這裡，知識建構代表：判斷哪些事物應被視為實體、哪些特徵需要被記錄、哪些關係必須被清楚標示。透過這樣的分析與組織，資料得以形成描述知識的結構，使 AI 在回應使用者問題時，更有機會依據穩定的知識結構來組織答案，而不是只依賴語言上的相似性進行推測。
+              </p>
+              <p>
+                因此，圖書館的編目規範、權威控制與主題分析，可視為一種分析與建構知識環境的能力。當資料進一步轉化為 linked data 或知識圖譜，圖書資訊專業者就能在資料、系統與使用者之間，設計可以理解、連結與驗證的知識結構，以此強化 AI 生成回答時所依據的知識基礎。
               </p>
             </div>
           </div>
@@ -498,37 +986,43 @@
 
         <section class="section" id="scenario" aria-labelledby="scenario-title">
           <div class="section-heading">
-            <h2 id="scenario-title">具體場景</h2>
+            <h2 id="scenario-title">檢索上的結合應用</h2>
             <div class="content">
               <div class="scenario">
+                <p>
+                  生成式AI可以先判斷問題中的重要條件，例如人物、作品主題、語言與版本需求，再依這些條件查找知識圖譜。知識圖譜提供可辨識、可驗證的實體與關係，讓系統找到適當內容後回傳給生成式AI後，再由生成式AI把這些結構化結果整理成容易閱讀的回答。
+                </p>
                 <p class="query">
-                  我想找 Jane Austen 作品中和婚姻主題有關的中文譯本。
+                  問題例：我想找 Jane Austen 作品中和婚姻主題有關的中文譯本。
                 </p>
+                <figure class="limit-figure">
+                  <div class="image-frame">
+                    <button class="image-zoom-button" type="button" aria-label="放大檢視 Jane Austen 檢索知識圖譜例" data-image-modal-open data-modal-src="./assets/jane-austen-search-knowledge-graph.png" data-modal-alt="Jane Austen 檢索知識圖譜例，呈現人物 Jane Austen、作品 Pride and Prejudice 等作品、主題 marriage，以及語言與版本之間的連結。">
+                      <img src="./assets/jane-austen-search-knowledge-graph.png" alt="Jane Austen 檢索知識圖譜例，呈現人物 Jane Austen、作品 Pride and Prejudice 等作品、主題 marriage，以及語言與版本之間的連結。">
+                    </button>
+                  </div>
+                  <figcaption>
+                    知識圖譜例
+                  </figcaption>
+                </figure>
                 <p>
-                  Gen AI 可以把這個問題理解成自然語言需求，也能把查到的資料整理成容易閱讀的回答。知識圖譜則可以把問題拆成可查詢、可驗證的結構。
-                </p>
-                <div class="entity-grid">
-                  <div class="entity-item">
-                    <strong>人物</strong>
-                    <span>Jane Austen</span>
-                  </div>
-                  <div class="entity-item">
-                    <strong>作品</strong>
-                    <span>Pride and Prejudice 等作品</span>
-                  </div>
-                  <div class="entity-item">
-                    <strong>主題</strong>
-                    <span>marriage</span>
-                  </div>
-                  <div class="entity-item">
-                    <strong>語言與版本</strong>
-                    <span>中文譯本、不同版本、不同館藏</span>
-                  </div>
-                </div>
-                <p>
-                  這種分工讓回答不只是一段文字，而是可以回到作者、作品、主題、譯本與館藏資料的連結路徑。對資訊組織而言，這正是知識圖譜在 Gen AI 時代的重要性。
+                  在這樣的合作檢索中，大語言模型可以分析檢索句中的檢索重點，例如使用者要找的是特定作者、特定主題、中文譯本，以及不同版本或館藏線索。知識圖譜的話，則是提供可查證的資料，例如 Jane Austen、相關作品、marriage 主題、中文譯本與館藏線索。生成式AI再把查得的內容，組織成使用者容易理解的回答。因此，回答不只是依語言機率性生成的文字，而是可以連回具體的實體、關係與資料來源。
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practice" aria-labelledby="practice-title">
+          <div class="section-heading">
+            <h2 id="practice-title">小練習</h2>
+            <div class="content">
+              <ol>
+                <li>說明為什麼生成式 AI 可以從概念上理解為根據上下文預測下一個詞的機率模型。</li>
+                <li>選一個中文查詢問句，指出其中哪些詞可能是實體，並說明這些實體之間可能有什麼關係。</li>
+                <li>說明單純使用生成式AI進行問答時，可能會遇到哪些限制或風險。</li>
+                <li>描述知識圖譜可以如何協助生成式AI，讓回答更容易被查證與維護。</li>
+              </ol>
             </div>
           </div>
         </section>
@@ -551,5 +1045,52 @@
         05 Knowledge Graph｜Section 02
       </footer>
     </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt || "";
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+      closeModalButton.addEventListener("click", closeImageModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
   </body>
 </html>
