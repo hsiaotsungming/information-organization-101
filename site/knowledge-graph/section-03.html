@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>03 RDF 與書目資料｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6.2vw, 5.8rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 8px 0 10px;
+        color: var(--ink);
+        font-size: clamp(1.4rem, 2vw, 1.75rem);
+        line-height: 1.3;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        font-size: clamp(1.2rem, 1.6vw, 1.48rem);
+        line-height: 1.72;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      code {
+        padding: 0.1em 0.28em;
+        border-radius: 5px;
+        color: #22384f;
+        background: #eef3f6;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .statement,
+      .note-panel {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .note-panel {
+        display: grid;
+        gap: 12px;
+        border-left-color: var(--orange);
+        background: var(--warm);
+      }
+
+      .note-panel h3 {
+        margin: 0;
+        color: var(--orange);
+        font-size: clamp(1.28rem, 1.7vw, 1.55rem);
+      }
+
+      .term-cards {
+        display: grid;
+        gap: 12px;
+      }
+
+      .term-card {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr);
+        align-items: start;
+        gap: 10px;
+        padding: 20px 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .term-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 1px solid rgba(31, 79, 120, 0.2);
+        border-radius: 8px;
+        color: var(--accent);
+        background: #f4f8fb;
+        font-size: 1.45rem;
+        font-weight: 800;
+      }
+
+      .term-card h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+      }
+
+      .term-card p {
+        font-size: clamp(1.08rem, 1.35vw, 1.22rem);
+        line-height: 1.68;
+      }
+
+      .triple-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .triple {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .triple span {
+        display: grid;
+        min-height: 64px;
+        place-items: center;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--ink);
+        background: #ffffff;
+        font-size: clamp(1.02rem, 1.35vw, 1.18rem);
+        font-weight: 800;
+        line-height: 1.45;
+        text-align: center;
+      }
+
+      .triple .predicate {
+        color: #ffffff;
+        background: var(--accent);
+      }
+
+      .triple .arrow {
+        color: var(--green);
+        font-size: 1.45rem;
+        font-weight: 800;
+      }
+
+      .source-figure {
+        display: grid;
+        gap: 12px;
+        margin: 4px 0 0;
+      }
+
+      .source-figure .image-frame {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .source-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+      }
+
+      .source-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .source-figure figcaption a {
+        color: var(--accent);
+      }
+
+      .figure-pair {
+        display: grid;
+        grid-template-columns: minmax(0, 45%) minmax(0, 55%);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .figure-pair .source-figure {
+        height: 100%;
+      }
+
+      .figure-pair .image-frame {
+        display: grid;
+        place-items: center;
+        height: clamp(400px, 46vw, 620px);
+      }
+
+      .figure-pair .image-zoom-button {
+        display: grid;
+        place-items: center;
+        height: 100%;
+      }
+
+      .figure-pair img {
+        width: auto;
+        height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .comparison-panel {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .comparison-panel h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+      }
+
+      .comparison-panel p {
+        font-size: clamp(1.08rem, 1.35vw, 1.22rem);
+        line-height: 1.68;
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(23, 35, 51, 0.18);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 3px;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-top: 10px;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        min-height: 120px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-link:hover {
+        border-color: #b8c7d6;
+        box-shadow: 0 14px 32px rgba(23, 35, 51, 0.06);
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .term-card,
+        .triple,
+        .comparison-grid,
+        .figure-pair,
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+
+        .figure-pair .image-frame {
+          height: auto;
+        }
+
+        .figure-pair .image-zoom-button {
+          height: auto;
+        }
+
+        .figure-pair img {
+          width: 100%;
+          height: auto;
+        }
+
+        .triple .arrow {
+          transform: rotate(90deg);
+          justify-self: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">回到課程首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Section 03</span>
+          <h1 id="page-title">RDF 與書目資料</h1>
+          <p class="lede">
+            RDF 是資源描述框架，用三元組描述資源與資料關係。對圖書館編目而言，它讓書目資料可以從單筆紀錄轉化為可連結、可查證、可重複使用的知識結構。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="本節小節導覽">
+          <a href="#bibliographic-record" aria-current="page">1. RDF 與書目紀錄</a>
+          <a href="#entities">2. 從紀錄到關係</a>
+          <a href="#triples">3. 三元組與圖</a>
+          <a href="#schema">4. RDF、RDFS 與 OWL</a>
+          <a href="#knowledge-graph">5. 從描述資料到知識圖譜</a>
+          <a href="#practice">6. 練習題目</a>
+        </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>理解 RDF 是一種以三元組描述資源之間關係的資料模型，而不是單純的資料格式。</li>
+                <li>區分書目紀錄中的資料單位與語意單位。</li>
+                <li>說明 RDF 如何讓傳統編目資料轉化為可連結、可重複使用、可與其他資料集整合的 linked data。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="bibliographic-record" aria-labelledby="bibliographic-record-title">
+          <div class="section-heading">
+            <h2 id="bibliographic-record-title">RDF 與書目紀錄</h2>
+            <div class="content">
+              <p class="statement">
+                RDF 的中文標準名稱為資源描述框架。它是一種用來描述網路資源與資料關係的資料模型。
+              </p>
+              <p>
+                RDF 的基本想法，是將資料拆解為一組組主詞、述詞、受詞的三元組，藉此表達某個資源與另一個資源，或某個資源與特定值之間的關係。對圖書館編目而言，RDF 的重要性在於：它讓書目資料不只是被放在一筆紀錄中，而是可以被拆解為作品、作者、主題、版本與館藏單件等實體，並透過明確的語意關係彼此連結。
+              </p>
+              <figure class="source-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視 RDF 範例三元組的非正式圖形" data-image-modal-open data-modal-src="./assets/rdf-sample-triples-graph.jpg" data-modal-alt="RDF 範例三元組的非正式圖形，呈現 Bob、Alice、Person、The Mona Lisa、Leonardo Da Vinci、La Joconde à Washington 等節點，以及朋友、興趣、出生日期、創作者與主題等關係。">
+                    <img src="./assets/rdf-sample-triples-graph.jpg" alt="RDF 範例三元組的非正式圖形，呈現 Bob、Alice、Person、The Mona Lisa、Leonardo Da Vinci、La Joconde à Washington 等節點，以及朋友、興趣、出生日期、創作者與主題等關係。">
+                  </button>
+                </div>
+                <figcaption>
+                  範例三元組的非正式圖形。<br>
+                  圖片來源：W3C，<a href="https://www.w3.org/TR/rdf11-primer/">RDF 1.1 Primer</a>
+                </figcaption>
+              </figure>
+              <p>
+                編目過往通常以單筆書目紀錄作為主要單位。一筆 MARC 紀錄可能同時包含題名、作者、出版者、出版年、主題、館藏資訊等內容。這種做法很適合館藏管理與目錄查詢，但當資料要放到網路環境中，並與其他機構、資料庫或知識系統連結時，就會遇到限制。
+              </p>
+              <p>
+                如果使用 RDF 模型來重組書目紀錄，重點就不再只是這筆紀錄有哪些欄位，而是這筆紀錄在描述哪些實體，以及這些實體之間有什麼關係。例如，《紅樓夢》是一個作品，曹雪芹是一位作者，清代小說是一個主題概念，某個出版社出版的版本則是一個具體版本。在 RDF 模型中，這些對象會被拆成不同的實體，再用關係把它們連起來。
+              </p>
+              <figure class="source-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視紅樓夢書目資料的 RDF 實體關係示意圖" data-image-modal-open data-modal-src="./assets/hongloumeng-rdf-entities.png" data-modal-alt="紅樓夢書目資料的 RDF 實體關係示意圖，中心為《紅樓夢》，連到作品、曹雪芹、清代小說與某出版社出版版本等節點。">
+                    <img src="./assets/hongloumeng-rdf-entities.png" alt="紅樓夢書目資料的 RDF 實體關係示意圖，中心為《紅樓夢》，連到作品、曹雪芹、清代小說與某出版社出版版本等節點。">
+                  </button>
+                </div>
+                <figcaption>
+                  《紅樓夢》書目資料可拆解為作品、作者、主題與具體版本等實體，並以明確關係彼此連結。
+                </figcaption>
+              </figure>
+              <p>
+                也就是說，編目資料不只是紀錄中的欄位，也可以被理解為一組實體與實體之間的語意關係。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="entities" aria-labelledby="entities-title">
+          <div class="section-heading">
+            <h2 id="entities-title">從單筆書目紀錄到多組實體關係</h2>
+            <div class="content">
+              <p>
+                一筆傳統書目紀錄通常會把許多描述資訊集中在一起。例如，一筆描述《紅樓夢》的 MARC 紀錄，可能同時包含題名、作者、版本、出版者、出版年、主題詞、分類號與館藏資訊。從目錄查詢的角度來看，這些資訊放在同一筆紀錄中很方便，但從 RDF 的角度來看，這些資訊其實可以拆成多個不同的實體與關係。
+              </p>
+              <p>
+                拆分的第一步，是先找出紀錄中提到哪些對象。以《紅樓夢》為例，作品本身可以是一個實體，曹雪芹可以是一個作者實體，清代小說可以是一個主題概念，某個出版社於某年出版的版本可以是一個版本或實例，圖書館實際收藏的那一本書則可以是一個館藏單件。這些對象在傳統紀錄中可能只是分散在不同欄位中的文字，但在 RDF 模型中，可以被視為彼此獨立、可被識別的實體。
+              </p>
+              <p>
+                第二步，是把這些實體之間的關係說清楚。例如，《紅樓夢》這個作品有作者曹雪芹，也有主題清代小說，某個出版版本是《紅樓夢》的一個具體版本，某個館藏單件則是圖書館持有的實體物件。用 RDF 的思維來看，這些都可以改寫成一組組關係：作品連到作者、作品連到主題、版本連到作品、館藏單件連到版本。如此一來，書目資料就不只是欄位的集合，而是一個由實體與關係構成的網絡。
+              </p>
+              <div class="triple-list" aria-label="紅樓夢書目資料拆解範例">
+                <div class="triple">
+                  <span>《紅樓夢》</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">作者</span>
+                  <span class="arrow">→</span>
+                  <span>曹雪芹</span>
+                </div>
+                <div class="triple">
+                  <span>《紅樓夢》</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">主題</span>
+                  <span class="arrow">→</span>
+                  <span>清代小說</span>
+                </div>
+                <div class="triple">
+                  <span>出版版本</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">版本屬於</span>
+                  <span class="arrow">→</span>
+                  <span>《紅樓夢》</span>
+                </div>
+              </div>
+              <p>
+                這種拆分方式的好處，是資料可以被重複使用與跨系統連結。曹雪芹不必在每一筆書目紀錄中都被當成文字重新輸入，而可以成為一個穩定的作者實體；不同版本的《紅樓夢》都可以連回同一個作品實體；不同圖書館的館藏單件也可以連到各自收藏的版本。當資料被整理成這種形式時，系統不只知道某筆紀錄中出現了哪些文字，也能理解這些文字背後指向哪些對象，以及它們彼此之間有什麼關係。
+              </p>
+              <aside class="note-panel">
+                <h3>Linked Data（鏈結資料）</h3>
+                <p>
+                  Linked data 是一種在網路環境中發布與連結資料的做法。它鼓勵資料提供者使用穩定 URI 識別資源，並用 RDF 描述資源之間的關係。如此一來，不同機構建立的作者、作品、主題或館藏資料，就能彼此連結，形成可被機器讀取與重複使用的資料網絡。
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="triples" aria-labelledby="triples-title">
+          <div class="section-heading">
+            <h2 id="triples-title">RDF 的核心：三元組與圖</h2>
+            <div class="content">
+              <p>
+                RDF 最基本的表達單位是三元組，也就是 subject、predicate、object。它可以理解為一句最小的資料敘述：某個對象，透過某種關係，連到另一個對象或某個值。當許多三元組彼此連接時，就會形成 RDF graph，也就是由節點與關係構成的資料圖。
+              </p>
+              <div class="term-cards" aria-label="RDF 三元組的三個位置">
+                <article class="term-card">
+                  <span class="term-icon" aria-hidden="true">S</span>
+                  <div>
+                    <h3>Subject</h3>
+                    <p>
+                      Subject 是這句話主要在描述的對象，也就是我們要談的是誰或什麼。例如，《紅樓夢》— 作者 — 曹雪芹這個三元組中，《紅樓夢》是 subject。
+                    </p>
+                  </div>
+                </article>
+                <article class="term-card">
+                  <span class="term-icon" aria-hidden="true">P</span>
+                  <div>
+                    <h3>Predicate</h3>
+                    <p>
+                      Predicate 是 subject 和 object 之間的關係，通常可以理解為實體間的某種關係或實體擁有的屬性。例如，作者是 predicate，表示作品和作者之間的關係。
+                    </p>
+                  </div>
+                </article>
+                <article class="term-card">
+                  <span class="term-icon" aria-hidden="true">O</span>
+                  <div>
+                    <h3>Object</h3>
+                    <p>
+                      Object 是這個關係所連到的另一個對象，或是某個具體的值。例如，曹雪芹是 object；若換成出版年，object 也可以是 1980 這樣的年份值。
+                    </p>
+                  </div>
+                </article>
+              </div>
+              <h3>三元組與 node、arc、node</h3>
+              <p>
+                RDF 三元組也可以畫成一個簡單的圖形結構：node、arc、node。Subject 和 object 通常會成為圖中的 node，predicate 則是連接兩個 node 的 arc。換句話說，三元組不是只適合用句子理解，也可以被視為圖中的一條有方向的關係。
+              </p>
+              <div class="triple-list" aria-label="RDF 三元組例子">
+                <div class="triple">
+                  <span>《紅樓夢》</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">作者</span>
+                  <span class="arrow">→</span>
+                  <span>曹雪芹</span>
+                </div>
+                <div class="triple">
+                  <span>Work A</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">hasSubject</span>
+                  <span class="arrow">→</span>
+                  <span>Topic B</span>
+                </div>
+                <div class="triple">
+                  <span>Instance A</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">instanceOf</span>
+                  <span class="arrow">→</span>
+                  <span>Work B</span>
+                </div>
+              </div>
+              <aside class="note-panel">
+                <h3>Node</h3>
+                <p>
+                  Node 是 RDF graph 中的節點，可以代表作品、作者、主題、機構等實體，也可以代表文字、日期或數字等值。在三元組中，subject 和 object 通常會成為 node。例如，《紅樓夢》和曹雪芹都可以是 node。
+                </p>
+              </aside>
+              <aside class="note-panel">
+                <h3>Arc</h3>
+                <p>
+                  Arc 是連接兩個 node 的有向線段，用來表示兩者之間的關係。在三元組中，predicate 通常對應到 arc。例如，《紅樓夢》— 作者 — 曹雪芹中，作者就是從《紅樓夢》指向曹雪芹的 arc。
+                </p>
+              </aside>
+              <h3>RDF graph：由多個三元組組成的資料圖</h3>
+              <p>
+                一個三元組只能描述一個最小關係，但書目資料通常包含許多關係。因此，RDF 會把多個三元組連接起來，形成一個 RDF graph。以《紅樓夢》為例，作品可以連到作者曹雪芹，也可以連到主題清代小說，某個出版版本可以連到作品，某個館藏單件又可以連到出版版本。這些三元組彼此連接後，就形成一個以作品、作者、主題、版本與館藏單件為節點的資料圖。
+              </p>
+              <figure class="source-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視 RDF graph 範例圖" data-image-modal-open data-modal-src="./assets/rdf-graph-edge-triple.jpg" data-modal-alt="RDF graph 範例圖，呈現 Stanford、MIT、department、Peter、John、Lisa 等節點，以及 type、memberOf、advisor、worksFor 等有向關係。">
+                    <img src="./assets/rdf-graph-edge-triple.jpg" alt="RDF graph 範例圖，呈現 Stanford、MIT、department、Peter、John、Lisa 等節點，以及 type、memberOf、advisor、worksFor 等有向關係。">
+                  </button>
+                </div>
+                <figcaption>
+                  RDF graph 範例：一條邊及其連接的頂點，對應到一個 RDF 三元組。<br>
+                  圖片來源：ResearchGate，<a href="https://www.researchgate.net/publication/262489425_PHD-Store_An_Adaptive_SPARQL_Engine_with_Dynamic_Partitioning_for_Distributed_RDF_Repositories/figures?lo=1">原始頁面</a>
+                </figcaption>
+              </figure>
+              <p>
+                這對編目很重要，因為傳統欄位中的內容可以被重新理解為一組組三元組。題名、作者、主題、出版年、語言等，不只是欄位值，而是可以被表達成某個資源具有某種屬性，或某個資源與另一個實體有某種關係。因此，RDF 提供了一種把書目資料轉化為語意網絡的方法。
+              </p>
+              <p>
+                另外，RDF 很重視識別。若只是寫曹雪芹，系統不一定知道它指的是哪一個人；若使用穩定 URI，則可以讓不同資料集指向同一個對象。這也是 RDF 與 linked data 能夠支援跨系統連結的基礎。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="schema" aria-labelledby="schema-title">
+          <div class="section-heading">
+            <h2 id="schema-title">RDF、RDFS 與 OWL 的角色</h2>
+            <div class="content">
+              <p>
+                RDF 是用三元組描述資源與關係的資料模型。它可以讓我們寫出像 Work A — hasAuthor — Agent B 這樣的敘述，表示某部作品與某位作者之間的關係。不過，當資料規模變大時，只寫出一組組三元組還不夠，我們還需要說明這些三元組中使用的詞彙代表什麼。
+              </p>
+              <p>
+                例如，資料中可能會出現 Work、Agent、hasAuthor、hasSubject 等詞彙。這時就需要進一步說明：Work 和 Agent 是什麼類型的概念？hasAuthor 這個關係通常連接哪兩種對象？某個資源為什麼可以被判定為作品或作者？RDFS 與 OWL 的角色，就是在 RDF 的基礎上，提供這些類別、屬性與關係的語意說明。
+              </p>
+              <div class="comparison-grid" aria-label="RDF、RDFS 與 OWL 的角色比較">
+                <article class="comparison-panel">
+                  <h3>RDF</h3>
+                  <p>負責表達個別資料敘述，例如某部作品有作者、某個版本屬於某部作品。</p>
+                </article>
+                <article class="comparison-panel">
+                  <h3>RDFS</h3>
+                  <p>提供基本的類別與屬性結構，說明資料中使用的類別、屬性、domain 與 range。</p>
+                </article>
+                <article class="comparison-panel">
+                  <h3>OWL</h3>
+                  <p>提供更完整、更精細的語意模型能力，能描述屬性類型、類別關係與推論限制。</p>
+                </article>
+              </div>
+              <h3>RDFS：提供基本的類別與屬性結構</h3>
+              <p>
+                RDFS 的全稱是 RDF Schema。它是建立在 RDF 之上的基本語意工具，主要用來說明資料中使用的類別與屬性。換句話說，RDFS 可以幫助我們描述資料模型中的基本結構，例如哪些資源屬於哪一類、某個屬性通常適用於哪一類資源，以及它的值通常應該是哪一類對象。
+              </p>
+              <div class="triple-list" aria-label="RDFS 例子">
+                <div class="triple">
+                  <span>Work123</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">rdf:type</span>
+                  <span class="arrow">→</span>
+                  <span>Work</span>
+                </div>
+                <div class="triple">
+                  <span>hasAuthor</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">rdfs:domain</span>
+                  <span class="arrow">→</span>
+                  <span>Work</span>
+                </div>
+                <div class="triple">
+                  <span>hasAuthor</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">rdfs:range</span>
+                  <span class="arrow">→</span>
+                  <span>Agent</span>
+                </div>
+              </div>
+              <p>
+                這表示 hasAuthor 這個關係通常是從 Work 連到 Agent。換句話說，當我們看到某個資源透過 hasAuthor 連到另一個對象時，可以理解前者通常是一個作品，後者通常是一個作者或創作者類型的實體。因此，RDFS 的重點在於提供基本的語意框架，讓 RDF 資料中的類別與屬性不只是名稱，而是具有可被理解的結構位置。
+              </p>
+              <h3>OWL：提供更完整的語意模型能力</h3>
+              <p>
+                OWL 的全稱是 Web Ontology Language。它同樣建立在 RDF 的基礎上，但比 RDFS 提供更完整的語意模型能力。若說 RDFS 主要用來描述基本的類別與屬性，那麼 OWL 則可以更細緻地描述類別之間、實體之間，以及屬性之間的關係。
+              </p>
+              <aside class="note-panel">
+                <h3>Ontology（本體）</h3>
+                <p>
+                  Ontology（本體）可以理解為某個知識領域中的概念模型。它會說明這個領域有哪些重要類別、這些類別有哪些屬性，以及不同類別之間有什麼關係。在圖書館資料中，ontology 可以用來描述作品、作者、版本、主題、館藏單件等概念，以及它們彼此之間的關聯。
+                </p>
+              </aside>
+              <p>
+                在 OWL 中，被描述的具體對象可以稱為 individuals，概念類型稱為 classes，關係或屬性稱為 properties。例如，Jane Austen 可以是一個 individual，Agent 可以是一個 class，而 hasAuthor 則可以是一個 property。
+              </p>
+              <div class="triple-list" aria-label="OWL property 例子">
+                <div class="triple">
+                  <span>Pride and Prejudice</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">hasAuthor</span>
+                  <span class="arrow">→</span>
+                  <span>Jane Austen</span>
+                </div>
+                <div class="triple">
+                  <span>Pride and Prejudice</span>
+                  <span class="arrow">→</span>
+                  <span class="predicate">publicationYear</span>
+                  <span class="arrow">→</span>
+                  <span>1813</span>
+                </div>
+              </div>
+              <p>
+                相較於 RDFS，OWL 的重點在於能表達更細緻的語意限制與推論關係。對圖書館資料來說，這表示作品與版本、作者與機構、作品與主題概念之間的關係，可以用更精細的語意模型來描述，使書目資料不只是可查詢的紀錄，也能成為可推論、可整合的知識結構。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="knowledge-graph" aria-labelledby="knowledge-graph-title">
+          <div class="section-heading">
+            <h2 id="knowledge-graph-title">從描述資料到知識圖譜</h2>
+            <div class="content">
+              <p>
+                RDF 與編目的關係，可以理解為把編目資料從紀錄格式轉化為語意連結。傳統編目強調如何正確描述一件資源，例如題名怎麼著錄、作者怎麼標目、版本資訊怎麼記錄。RDF 並不是要取代這些編目知識，而是提供另一種資料表達方式，讓這些描述可以被機器理解、連結與再利用。
+              </p>
+              <div class="figure-pair" aria-label="BIBFRAME 模型比較圖">
+                <figure class="source-figure">
+                  <div class="image-frame">
+                    <button class="image-zoom-button" type="button" aria-label="放大檢視 BIBFRAME 模型圖" data-image-modal-open data-modal-src="./assets/bibframe-model.png" data-modal-alt="BIBFRAME 模型圖，呈現 Work 與 Instance 之間的 hasInstance 關係，以及 Work 連到 subject、creator，Instance 連到 publisher、publishedAt、format 等描述節點。">
+                      <img src="./assets/bibframe-model.png" alt="BIBFRAME 模型圖，呈現 Work 與 Instance 之間的 hasInstance 關係，以及 Work 連到 subject、creator，Instance 連到 publisher、publishedAt、format 等描述節點。">
+                    </button>
+                  </div>
+                  <figcaption>
+                    The BIBFRAME Model<br>
+                    圖片來源：LibTech Launchpad，<a href="https://libtechlaunchpad.com/basics-and-resources/bibframe/">原始頁面</a>
+                  </figcaption>
+                </figure>
+                <figure class="source-figure">
+                  <div class="image-frame">
+                    <button class="image-zoom-button" type="button" aria-label="放大檢視 BIBFRAME 2.0 模型圖" data-image-modal-open data-modal-src="./assets/bibframe-2-model.jpg" data-modal-alt="BIBFRAME 2.0 模型圖，呈現 Work、Instance、Item 三層結構，以及 subject、agent、event、publisher、barcode 等關聯節點。">
+                      <img src="./assets/bibframe-2-model.jpg" alt="BIBFRAME 2.0 模型圖，呈現 Work、Instance、Item 三層結構，以及 subject、agent、event、publisher、barcode 等關聯節點。">
+                    </button>
+                  </div>
+                  <figcaption>
+                    The BIBFRAME 2.0 Model<br>
+                    圖片來源：Library of Congress，<a href="https://www.loc.gov/bibframe/docs/bibframe2-model.html">原始頁面</a>
+                  </figcaption>
+                </figure>
+              </div>
+              <p>
+                以 BIBFRAME 為例，它試圖把書目資料轉為較適合 linked data 環境的模型。作品、實例、單件、作者、主題等不再只是欄位中的文字，而可以成為可識別的實體。這使圖書館資料更容易和其他資料來源連結，例如權威資料、主題詞表、出版資料、研究資料庫或文化資產資料庫。
+              </p>
+              <p>
+                從這個角度來看，RDF 可以作為整理書目資料、建構知識圖譜的基礎。知識圖譜的重點，是把不同對象拆成節點，並用明確的關係把它們連接起來。RDF 的角色，則是用三元組把這些節點與關係表達出來。當作品、作者、主題、版本與館藏單件都能成為節點，並透過作者、主題、版本、館藏等關係彼此連接時，書目資料就不只是用來顯示單筆紀錄，而能形成一個可查詢、可連結、可推論的知識網絡。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practice" aria-labelledby="practice-title">
+          <div class="section-heading">
+            <h2 id="practice-title">練習題目</h2>
+            <div class="content">
+              <ol>
+                <li>請將下列敘述改寫成 RDF 三元組形式：《傲慢與偏見》的作者是 Jane Austen。</li>
+                <li>請判斷下列哪些比較適合視為可識別的實體，哪些比較像文字、年份或語言等值：<code>Jane Austen</code>、<code>1813</code>、<code>English</code>、<code>Pride and Prejudice</code>、<code>臺北市立圖書館</code>。</li>
+                <li>請用 RDF 的思維，拆解一筆書目紀錄中可能包含的實體。至少列出：作品、作者、主題、版本或實例、館藏單件。</li>
+                <li>假設有一個 property 叫做 <code>hasAuthor</code>，請說明它的 subject 和 object 在圖書館書目資料中可能分別是什麼。</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./section-02.html">
+            <span class="pager-label">上一節</span>
+            <span class="pager-title">02 為什麼生成式AI下還需要知識圖譜？</span>
+            <span class="pager-note">回看生成式AI與知識圖譜在知識組織上的互補關係。</span>
+          </a>
+          <a class="pager-link" href="./index.html">
+            <span class="pager-label">章首頁</span>
+            <span class="pager-title">05 Knowledge Graph</span>
+            <span class="pager-note">回到本章目次，查看已撰寫的 Section。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Section 03
+      </footer>
+    </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt;
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        modalImage.alt = "";
+
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+
+        activeImageButton = null;
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+
+      closeModalButton.addEventListener("click", closeImageModal);
+
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
+  </body>
+</html>
