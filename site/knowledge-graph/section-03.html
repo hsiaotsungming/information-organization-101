@@ -819,16 +819,19 @@
               </div>
               <h3>RDFS：提供基本的類別與屬性結構</h3>
               <p>
-                RDFS 的全稱是 RDF Schema。它是建立在 RDF 之上的基本語意工具，主要用來說明資料中使用的類別與屬性。換句話說，RDFS 可以幫助我們描述資料模型中的基本結構，例如哪些資源屬於哪一類、某個屬性通常適用於哪一類資源，以及它的值通常應該是哪一類對象。
+                RDFS 的全稱是 RDF Schema。它是建立在 RDF 之上的基本語意工具，主要用來說明資料中使用的類別與屬性。換句話說，RDFS 可以幫助我們描述資料模型中的基本結構，例如哪些資源屬於哪一類、某個屬性通常適用於哪一類資源，以及它的值通常應該是哪一類對象。例如：
               </p>
               <div class="triple-list" aria-label="RDFS 例子">
                 <div class="triple">
-                  <span>Work123</span>
+                  <span>ex:Van</span>
                   <span class="arrow">→</span>
-                  <span class="predicate">rdf:type</span>
+                  <span class="predicate">rdfs:subClassOf</span>
                   <span class="arrow">→</span>
-                  <span>Work</span>
+                  <span>ex:MotorVehicle</span>
                 </div>
+                <p>
+                  <code>rdfs:subClassOf</code> 用來定義類別之間的階層關係。如果 A 類別是 B 類別的子類別，那麼所有屬於 A 的實例，也同時會是 B 的實例。卡片中的意思是：Van 是一種 MotorVehicle。
+                </p>
                 <div class="triple">
                   <span>hasAuthor</span>
                   <span class="arrow">→</span>
@@ -836,13 +839,19 @@
                   <span class="arrow">→</span>
                   <span>Work</span>
                 </div>
+                <p>
+                  <code>rdfs:domain</code> 用來指出某個 property 被使用時，三元組中的 subject 應該屬於哪一個類別。它可以視為一種限制，表示凡是使用這個 property 的資源，通常應該是指定類別的實例。卡片中的意思是：只要某個資源使用了 hasAuthor 這個屬性，那這個資源就應該被視為 Work 類別的東西。
+                </p>
                 <div class="triple">
-                  <span>hasAuthor</span>
+                  <span>ex:hasAuthor</span>
                   <span class="arrow">→</span>
                   <span class="predicate">rdfs:range</span>
                   <span class="arrow">→</span>
-                  <span>Agent</span>
+                  <span>ex:Person</span>
                 </div>
+                <p>
+                  <code>rdfs:range</code> 用來指出某個 property 被使用時，三元組中的 object 應該屬於哪一個類別，或應該是哪一種資料型別。它可以視為一種限制，表示這個 property 可以連接到哪些類型的值。卡片中的意思是：只要某個資源使用了 hasAuthor 這個屬性，那麼這個屬性所指向的對象，就應該被視為 Person 類別的東西。
+                </p>
               </div>
               <p>
                 這表示 hasAuthor 這個關係通常是從 Work 連到 Agent。換句話說，當我們看到某個資源透過 hasAuthor 連到另一個對象時，可以理解前者通常是一個作品，後者通常是一個作者或創作者類型的實體。因此，RDFS 的重點在於提供基本的語意框架，讓 RDF 資料中的類別與屬性不只是名稱，而是具有可被理解的結構位置。
