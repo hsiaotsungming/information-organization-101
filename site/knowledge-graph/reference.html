@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reference｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --soft: #eef3f6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1120px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .hero {
+        max-width: 920px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6vw, 5.2rem);
+        line-height: 1.06;
+      }
+
+      .lede {
+        max-width: 860px;
+        margin-top: 20px;
+        color: #40505f;
+        font-size: clamp(1.25rem, 2vw, 1.7rem);
+        line-height: 1.64;
+      }
+
+      .reference-list {
+        margin: 0;
+        padding-left: 1.4em;
+      }
+
+      .reference-list li {
+        color: var(--muted);
+        color: var(--muted);
+        font-size: clamp(1.08rem, 1.4vw, 1.2rem);
+        line-height: 1.8;
+        word-break: break-word;
+      }
+
+      .reference-list li + li {
+        margin-top: 16px;
+      }
+
+      .reference-list a {
+        color: var(--accent);
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 760px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="./index.html">回到 Knowledge Graph 章首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Reference</span>
+          <h1 id="page-title">參考資料</h1>
+        </section>
+
+        <ol class="reference-list" aria-label="Reference list">
+          <li>陳亞寧、牛惠曼（2020）。圖書館鏈結資料入門指引。國家圖書館。</li>
+          <li>國家圖書館、國立臺灣大學圖書館（n.d.）。LDT@Library。<a href="https://ld.ncl.edu.tw/">https://ld.ncl.edu.tw/</a></li>
+          <li>Bast, H., Kalmbach, J., Klumpp, T., &amp; Korzen, C. (2024). Knowledge graphs and search. In O. Alonso &amp; R. Baeza-Yates (Eds.), Information retrieval: Advanced topics and techniques (pp. 231–281). Association for Computing Machinery. <a href="https://doi.org/10.1145/3674127.3674134">https://doi.org/10.1145/3674127.3674134</a></li>
+          <li>Edge, D., Trinh, H., Cheng, N., Bradley, J., Chao, A., Mody, A., Truitt, S., Metropolitansky, D., Ness, R. O., &amp; Larson, J. (2024). From local to global: A Graph RAG approach to query-focused summarization (arXiv:2404.16130). arXiv. <a href="https://doi.org/10.48550/arXiv.2404.16130">https://doi.org/10.48550/arXiv.2404.16130</a></li>
+          <li>Hogan, A., Dong, X. L., Vrandečić, D., &amp; Weikum, G. (2025). Large language models, knowledge graphs and search engines: A crossroads for answering users’ questions (arXiv:2501.06699). arXiv. <a href="https://doi.org/10.48550/arXiv.2501.06699">https://doi.org/10.48550/arXiv.2501.06699</a></li>
+          <li>Negro, A., Futia, G., Kůs, V., &amp; Montagna, F. (2025). Knowledge graphs and LLMs in action: Build AI systems using connected data. Manning Publications.</li>
+        </ol>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Reference
+      </footer>
+    </div>
+  </body>
+</html>

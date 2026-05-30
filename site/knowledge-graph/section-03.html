@@ -926,6 +926,17 @@
               <p>
                 以 BIBFRAME 為例，它試圖把書目資料轉為較適合 linked data 環境的模型。作品、實例、單件、作者、主題等不再只是欄位中的文字，而可以成為可識別的實體。這使圖書館資料更容易和其他資料來源連結，例如權威資料、主題詞表、出版資料、研究資料庫或文化資產資料庫。
               </p>
+              <figure class="source-figure">
+                <div class="image-frame">
+                  <button class="image-zoom-button" type="button" aria-label="放大檢視 MARC 與 linked data 描述資源方式之對照圖" data-image-modal-open data-modal-src="./assets/marc-vs-linked-data-jane-austen.jpg" data-modal-alt="MARC 與 linked data 描述資源方式之對照圖，上方顯示 MARC 245 與 600 欄位內容，下方以 BIBFRAME 關係呈現 Jane Austen and her world 作品節點、Jane Austen 權威節點，以及 bf:title、bf:subject 關係。">
+                    <img src="./assets/marc-vs-linked-data-jane-austen.jpg" alt="MARC 與 linked data 描述資源方式之對照圖，上方顯示 MARC 245 與 600 欄位內容，下方以 BIBFRAME 關係呈現 Jane Austen and her world 作品節點、Jane Austen 權威節點，以及 bf:title、bf:subject 關係。">
+                  </button>
+                </div>
+                <figcaption>
+                  MARC 與 LD 描述資源方式之對照<br>
+                  來源：<a href="https://nclfile.ncl.edu.tw/files/202207/a0b2ff6f-97b5-4990-a400-8f12c0693d19.pdf">圖書館鏈結資料入門指引</a>
+                </figcaption>
+              </figure>
               <p>
                 從這個角度來看，RDF 可以作為整理書目資料、建構知識圖譜的基礎。知識圖譜的重點，是把不同對象拆成節點，並用明確的關係把它們連接起來。RDF 的角色，則是用三元組把這些節點與關係表達出來。當作品、作者、主題、版本與館藏單件都能成為節點，並透過作者、主題、版本、館藏等關係彼此連接時，書目資料就不只是用來顯示單筆紀錄，而能形成一個可查詢、可連結、可推論的知識網絡。
               </p>
@@ -951,12 +962,12 @@
           <a class="pager-link" href="./section-02.html">
             <span class="pager-label">上一節</span>
             <span class="pager-title">02 為什麼生成式AI下還需要知識圖譜？</span>
-            <span class="pager-note">回看生成式AI與知識圖譜在知識組織上的互補關係。</span>
+            <span class="pager-note">回看大型語言模型與知識圖譜在知識處理上的差異。</span>
           </a>
-          <a class="pager-link" href="./index.html">
-            <span class="pager-label">章首頁</span>
-            <span class="pager-title">05 Knowledge Graph</span>
-            <span class="pager-note">回到本章目次，查看已撰寫的 Section。</span>
+          <a class="pager-link" href="./section-04.html">
+            <span class="pager-label">下一節</span>
+            <span class="pager-title">04 RAG：讓 LLM 根據資料回答</span>
+            <span class="pager-note">接著看檢索增強生成如何先找資料、再讓模型根據資料作答。</span>
           </a>
         </nav>
       </main>

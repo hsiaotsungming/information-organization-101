@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>05 Graph RAG：讓 LLM 基於實體關係回答｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .chapter-nav,
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-nav a,
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .chapter-nav a[aria-current="page"],
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6.2vw, 5.8rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 8px 0 10px;
+        color: var(--ink);
+        font-size: clamp(1.4rem, 2vw, 1.75rem);
+        line-height: 1.3;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        color: var(--muted);
+        font-size: clamp(1.2rem, 1.6vw, 1.48rem);
+        line-height: 1.72;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .statement,
+      .note-panel {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .note-panel {
+        border-left-color: var(--orange);
+        background: var(--warm);
+      }
+
+      .generation-figure {
+        margin: 4px 0 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .generation-figure .image-crop {
+        width: 100%;
+        aspect-ratio: 1672 / 565;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .generation-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+        transform: translateY(-20%);
+      }
+
+      .generation-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .limit-figure {
+        display: grid;
+        gap: 12px;
+        margin: 4px 0 0;
+      }
+
+      .limit-figure .image-frame {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .limit-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+      }
+
+      .limit-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .strength-cards {
+        display: grid;
+        gap: 12px;
+      }
+
+      .strength-card {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr);
+        align-items: start;
+        gap: 10px;
+        padding: 20px 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .strength-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 1px solid rgba(31, 79, 120, 0.2);
+        border-radius: 8px;
+        color: var(--accent);
+        background: #f4f8fb;
+      }
+
+      .strength-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .strength-card h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+      }
+
+      .strength-card p {
+        font-size: clamp(1.08rem, 1.35vw, 1.22rem);
+        line-height: 1.68;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .comparison-panel {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .comparison-panel-heading {
+        display: grid;
+        gap: 6px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .comparison-panel-heading h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(1.45rem, 2vw, 1.85rem);
+        line-height: 1.5;
+      }
+
+      .comparison-panel-heading p {
+        color: var(--muted);
+        font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+        line-height: 1.6;
+      }
+
+      .comparison-points {
+        display: grid;
+        gap: 12px;
+      }
+
+      .comparison-point {
+        display: grid;
+        gap: 6px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .comparison-point h4 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.16rem, 1.5vw, 1.35rem);
+        line-height: 1.4;
+      }
+
+      .comparison-panel:first-child .comparison-point h4 {
+        color: var(--green);
+      }
+
+      .comparison-point p {
+        font-size: clamp(1.18rem, 1.55vw, 1.38rem);
+        line-height: 1.68;
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(23, 35, 51, 0.18);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 3px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+      }
+
+      th,
+      td {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--ink);
+        background: var(--soft);
+        font-weight: 800;
+      }
+
+      .scenario {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .query {
+        padding: 18px 20px;
+        border-left: 5px solid var(--accent);
+        background: #f4f8fb;
+        color: var(--ink);
+        font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+        line-height: 1.65;
+      }
+
+      .entity-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .entity-item {
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .entity-item strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--accent);
+        font-size: 1rem;
+      }
+
+      .entity-item span {
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.55;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-top: 10px;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        min-height: 120px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-link:hover {
+        border-color: #b8c7d6;
+        box-shadow: 0 14px 32px rgba(23, 35, 51, 0.06);
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .entity-grid,
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+
+        .strength-card {
+          grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">回到課程首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Section 05</span>
+          <h1 id="page-title">Graph RAG：讓 LLM 基於實體關係回答</h1>
+          <p class="lede">
+            Graph RAG 把 RAG 的檢索流程和知識圖譜中的實體關係結合起來，讓系統不只找相關文字，也能沿著資料中的關係脈絡來回答問題。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="本節小節導覽">
+          <a href="#opening" aria-current="page">1. Graph RAG 是什麼</a>
+          <a href="#difference">2. 和一般 RAG 的差別</a>
+          <a href="#graph-retrieval">3. 沿著關係檢索</a>
+          <a href="#value">4. 什麼問題更適合</a>
+          <a href="#role">5. 知識圖譜的角色</a>
+          <a href="#practice">6. 小練習</a>
+        </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>理解 Graph RAG 如何把一般 RAG 的檢索流程與知識圖譜中的實體關係結合起來。</li>
+                <li>區分一般 RAG 與 Graph RAG 在檢索對象與適用問題上的差別。</li>
+                <li>說明知識圖譜為什麼是 Graph RAG 回答關係型問題的重要基礎。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="opening" aria-labelledby="opening-title">
+          <div class="section-heading">
+            <h2 id="opening-title">Graph RAG 是什麼</h2>
+            <div class="content">
+              <p class="statement">
+                Graph RAG 可以理解為把 RAG 的檢索流程和知識圖譜的實體關係結合起來。
+              </p>
+              <p>
+                一般 RAG 會先從文件、段落或資料庫中找回與問題相關的文字，再讓大型語言模型根據這些內容生成回答；Graph RAG 則進一步讓系統不只檢索文字，也能檢索資料中的實體與關係。
+              </p>
+              <p>
+                在知識圖譜中，知識通常被表示成「實體—關係—實體」的形式。知識圖譜可以被看成一種有方向、邊帶有標籤的圖：每個節點代表一個實體，例如人物、地點、作品或機構；每條邊代表兩個實體之間的關係，例如出生地、作者、作品、獲獎紀錄等。這種資料也可以用「主詞—謂詞—受詞」的三元組表示，例如「Sanna Marin—place of birth—Helsinki」。
+              </p>
+              <p>
+                因此，Graph RAG 的重點不是只問「哪些文字和使用者問題相似」，而是進一步問「問題中涉及哪些實體？這些實體之間有什麼關係？哪些關係可以支持回答？」例如在圖書館情境中，系統可以把作者、作品、譯本、主題詞、館藏地、語言、版本與數位資源連結視為不同實體，再利用它們之間的關係協助回答。大型語言模型最後仍負責把結果整理成自然語言，但它依據的不只是文字片段，而是包含實體關係的檢索結果。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="difference" aria-labelledby="difference-title">
+          <div class="section-heading">
+            <h2 id="difference-title">Graph RAG 和一般 RAG 的差別</h2>
+            <div class="content">
+              <p>
+                一般 RAG 的主要檢索對象通常是文字內容，例如文件段落、摘要、書目描述、網頁內容或知識庫條目。系統會根據使用者問題進行語意搜尋，找出相似度較高的文字片段，再把這些片段放入 prompt，讓大型語言模型整理回答。這種方式適合回答許多和文件內容有關的問題，但如果問題需要判斷資料之間的結構關係，就可能出現限制。
+              </p>
+              <p>
+                Graph RAG 的差別在於，它會把資料中的實體與關係納入檢索基礎。換句話說，一般 RAG 偏向「找相關文本」，Graph RAG 則偏向「找相關實體、關係與文本」。這和知識圖譜的特性相呼應：知識圖譜不只是保存文字，而是用節點與有標籤的邊來描述世界中的對象及其關係。
+              </p>
+              <p class="query">
+                問題例：我想找有民俗信仰元素，而且館內有繁體中文版本的輕小說作品。
+              </p>
+              <p>
+                例如，使用者問「我想找有民俗信仰元素，而且館內有繁體中文版本的輕小說作品」。一般 RAG 可能會找出含有「民俗信仰」、「輕小說」、「繁體中文」等字詞的摘要或評論，但不一定能穩定判斷作品、版本、語言與館藏狀態之間的關係。Graph RAG 則可以把問題拆成多個實體與條件：作品類型、主題元素、語言版本、館藏紀錄與可取得狀態。系統先根據這些關係找出符合條件的資料，再由模型整理成回答。
+              </p>
+              <p>
+                因此，Graph RAG 並不是取代一般 RAG，而是補強一般 RAG 在實體關係判斷上的不足。當問題只需要根據文字內容摘要時，一般 RAG 可能已經足夠；但當問題需要跨欄位、跨紀錄或跨資料來源理解關係時，Graph RAG 就更有用。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="graph-retrieval" aria-labelledby="graph-retrieval-title">
+          <div class="section-heading">
+            <h2 id="graph-retrieval-title">沿著實體關係檢索</h2>
+            <div class="content">
+              <p>
+                Graph RAG 的關鍵，是讓系統能夠沿著實體之間的關係進行檢索。這裡的「沿著關係」可以理解為：系統不是只比對一段文字是否相似，而是從某個實體出發，依照資料中定義好的關係，找到其他相關實體。
+              </p>
+              <p>
+                例如，在圖書館資料中，「某作者—創作—某作品」、「某作品—具有主題—民俗信仰」、「某作品—有版本—繁體中文譯本」、「某版本—館藏於—某分館」都可以被視為實體關係。當使用者提出自然語言問題時，系統可以先辨識問題中的條件，再轉換成圖譜中的查詢路徑。這個過程不只是找出含有關鍵字的紀錄，而是判斷哪些資料在結構上符合使用者的需求。
+              </p>
+              <p>
+                知識圖譜常見的查詢語言包括 SPARQL 與 Cypher。SPARQL 是 RDF 知識圖譜常用的查詢語言，適合針對「主詞—謂詞—受詞」形式的資料進行語意精確的查詢；Cypher 則常見於 property graph 的查詢環境，使用圖形化的節點與關係模式描述查詢。這些查詢語言提供了一種方式，讓系統可以精確地表達「我要找哪些實體，以及它們之間必須具有什麼關係」。
+              </p>
+              <p>
+                在實際應用中，Graph RAG 不一定要完全依賴手寫查詢語言。系統也可以先用語意檢索找出候選資料，再用知識圖譜補充實體關係；或是先從問題中辨識實體，再查詢圖譜中與這些實體相連的節點。最後，這些被找回來的實體、關係與相關文字，會一起提供給大型語言模型。模型的任務不是自行猜測關係，而是根據系統找出的關係脈絡，把結果整理成使用者能理解的回答。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="value" aria-labelledby="value-title">
+          <div class="section-heading">
+            <h2 id="value-title">什麼問題更適合 Graph RAG</h2>
+            <div class="content">
+              <p>
+                Graph RAG 特別適合處理那些需要理解「資料之間的關係」的問題。若使用者只是問一段文件的摘要、某個條文的內容，或某份報告中的明確資訊，一般 RAG 可能已經可以處理。但如果問題涉及多個條件、多個實體，或需要跨資料來源整合，Graph RAG 通常更有優勢。
+              </p>
+              <p>
+                在圖書館與知識組織場景中，這類問題很常見。例如：「找出某位作者作品的繁體中文譯本」、「比較同一作品的不同版本」、「找出某個主題底下適合入門的資料」、「推薦與某本書主題相近、但目前館內可借的資料」、「查詢某個人物與事件、地點或作品之間的關係」。這些問題表面上像是自然語言問答，但背後其實需要系統理解作者、作品、譯本、主題、館藏地與可取得狀態之間的關係。
+              </p>
+              <p>
+                Graph RAG 也適合用在資料來源彼此相連的情境。知識圖譜的一個優點是可以和文字資料、不同資料集或外部知識來源結合。例如，可以把文字中的實體辨識出來，並連結到知識圖譜中的實體；也可以透過不同資料集之間的實體連結，進行跨來源查詢。
+              </p>
+              <p>
+                不過，Graph RAG 不一定適合所有問題。如果資料本身沒有被整理成實體與關係，或者關係建模不清楚，Graph RAG 的效果就會受到限制。它不是讓模型變得自動理解所有關係，而是依賴資料中已經存在、或可以被抽取與建構出來的關係。因此，越是需要根據明確關係回答的問題，越適合使用 Graph RAG；越是單純摘要文字或回答單一文件內容的問題，則不一定需要加入圖譜。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="role" aria-labelledby="role-title">
+          <div class="section-heading">
+            <h2 id="role-title">知識圖譜的角色</h2>
+            <div class="content">
+              <p>
+                在 Graph RAG 中，知識圖譜扮演的是「關係基礎設施」的角色。它讓系統能把原本分散在不同欄位、紀錄或文件中的資訊，組織成可以被查詢與推理的關係網絡。大型語言模型負責生成自然語言回答，但知識圖譜提供了回答前的資料結構，協助系統判斷哪些實體相關、它們如何連接，以及哪些資料可以作為回答依據。
+              </p>
+              <p>
+                知識圖譜的基本資料模型雖然簡單，但相當通用：節點代表實體，帶標籤的有向邊代表關係，而 RDF 則以主詞、謂詞、受詞三元組作為核心資料模型。這種形式使得知識圖譜能夠描述人物、作品、地點、事件、主題、分類與其他實體之間的連結。
+              </p>
+              <p>
+                在圖書館場景中，知識圖譜可以來自既有的資訊組織成果，例如書目紀錄、權威控制、主題標目、分類號、館藏資料、數位典藏詮釋資料與外部識別碼。這些資料若只是被當成文字欄位使用，模型只能做相似度比對；但若被整理成圖譜，系統就可以更清楚地知道「這是同一位作者」、「這是同一作品的不同譯本」、「這個主題是另一個主題的下位概念」、「這筆館藏有可取得的電子版本」。
+              </p>
+              <p>
+                因此，Graph RAG 的品質不只取決於大型語言模型，也取決於知識圖譜本身是否可靠。若題名、作者、主題、版本、語言、權威紀錄與館藏資訊清楚一致，系統就更容易沿著正確關係找回資料；反之，如果資料名稱混亂、欄位不一致、主題詞不穩定或實體連結錯誤，Graph RAG 也可能沿著錯誤關係生成不可靠的回答。換句話說，知識圖譜不是附加裝飾，而是 Graph RAG 能否根據實體關係回答的關鍵基礎。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practice" aria-labelledby="practice-title">
+          <div class="section-heading">
+            <h2 id="practice-title">小練習</h2>
+            <div class="content">
+              <ol>
+                <li>用自己的話說明 Graph RAG 和一般 RAG 最大的不同是什麼。</li>
+                <li>請設計一個圖書館查詢問題，並指出其中涉及哪些實體與哪些關係。</li>
+                <li>請說明如果知識圖譜中的作者、主題或版本關係整理得不清楚，Graph RAG 可能會受到哪些影響。</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./section-04.html">
+            <span class="pager-label">上一節</span>
+            <span class="pager-title">04 RAG：讓 LLM 根據資料回答</span>
+            <span class="pager-note">回看如何先找回可用資料，再讓模型根據內容生成答案。</span>
+          </a>
+          <a class="pager-link" href="./index.html">
+            <span class="pager-label">章首頁</span>
+            <span class="pager-title">05 Knowledge Graph</span>
+            <span class="pager-note">回到本章目次，查看本章五個 Section。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Section 05
+      </footer>
+    </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt || "";
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+      closeModalButton.addEventListener("click", closeImageModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>04 RAG：讓 LLM 根據資料回答｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .chapter-nav,
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .chapter-nav a,
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .chapter-nav a[aria-current="page"],
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6.2vw, 5.8rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 8px 0 10px;
+        color: var(--ink);
+        font-size: clamp(1.4rem, 2vw, 1.75rem);
+        line-height: 1.3;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li,
+      td,
+      th {
+        color: var(--muted);
+        font-size: clamp(1.2rem, 1.6vw, 1.48rem);
+        line-height: 1.72;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .statement,
+      .note-panel {
+        padding: 24px 28px;
+        border-left: 5px solid var(--green);
+        background: var(--panel);
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .note-panel {
+        border-left-color: var(--orange);
+        background: var(--warm);
+      }
+
+      .generation-figure {
+        margin: 4px 0 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .generation-figure .image-crop {
+        width: 100%;
+        aspect-ratio: 1672 / 565;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .generation-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+        transform: translateY(-20%);
+      }
+
+      .generation-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .limit-figure {
+        display: grid;
+        gap: 12px;
+        margin: 4px 0 0;
+      }
+
+      .limit-figure .image-frame {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .limit-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-width: none;
+        border: 0;
+      }
+
+      .limit-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .rag-flow-figure {
+        display: grid;
+        gap: 12px;
+        margin: 4px 0 0;
+      }
+
+      .rag-flow-figure .image-frame {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .rag-flow-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .rag-flow-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .strength-cards {
+        display: grid;
+        gap: 12px;
+      }
+
+      .strength-card {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr);
+        align-items: start;
+        gap: 10px;
+        padding: 20px 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .strength-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border: 1px solid rgba(31, 79, 120, 0.2);
+        border-radius: 8px;
+        color: var(--accent);
+        background: #f4f8fb;
+      }
+
+      .strength-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .strength-card h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+      }
+
+      .strength-card p {
+        font-size: clamp(1.08rem, 1.35vw, 1.22rem);
+        line-height: 1.68;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .comparison-panel {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .comparison-panel-heading {
+        display: grid;
+        gap: 6px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .comparison-panel-heading h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(1.45rem, 2vw, 1.85rem);
+        line-height: 1.5;
+      }
+
+      .comparison-panel-heading p {
+        color: var(--muted);
+        font-size: clamp(1.1rem, 1.4vw, 1.25rem);
+        line-height: 1.6;
+      }
+
+      .comparison-points {
+        display: grid;
+        gap: 12px;
+      }
+
+      .comparison-point {
+        display: grid;
+        gap: 6px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .comparison-point h4 {
+        margin: 0;
+        color: var(--accent);
+        font-size: clamp(1.16rem, 1.5vw, 1.35rem);
+        line-height: 1.4;
+      }
+
+      .comparison-panel:first-child .comparison-point h4 {
+        color: var(--green);
+      }
+
+      .comparison-point p {
+        font-size: clamp(1.18rem, 1.55vw, 1.38rem);
+        line-height: 1.68;
+      }
+
+      .flow-steps {
+        display: grid;
+        gap: 14px;
+      }
+
+      .flow-step {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+        padding: 20px 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .flow-step-icon {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        border: 1px solid rgba(31, 79, 120, 0.2);
+        border-radius: 10px;
+        color: var(--accent);
+        background: #f4f8fb;
+      }
+
+      .flow-step-icon svg {
+        width: 30px;
+        height: 30px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .flow-step-body {
+        display: grid;
+        gap: 4px;
+      }
+
+      .flow-step-body h4 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(1.22rem, 1.6vw, 1.45rem);
+        line-height: 1.4;
+      }
+
+      .flow-step-body p {
+        font-size: clamp(1.12rem, 1.4vw, 1.28rem);
+        line-height: 1.68;
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid rgba(23, 35, 51, 0.18);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 3px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+      }
+
+      th,
+      td {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--ink);
+        background: var(--soft);
+        font-weight: 800;
+      }
+
+      .scenario {
+        display: grid;
+        gap: 16px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .query {
+        padding: 18px 20px;
+        border-left: 5px solid var(--accent);
+        background: #f4f8fb;
+        color: var(--ink);
+        font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+        line-height: 1.65;
+      }
+
+      .entity-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .entity-item {
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .entity-item strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--accent);
+        font-size: 1rem;
+      }
+
+      .entity-item span {
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.55;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-top: 10px;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        min-height: 120px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-link:hover {
+        border-color: #b8c7d6;
+        box-shadow: 0 14px 32px rgba(23, 35, 51, 0.06);
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 920px) {
+        .site {
+          width: min(100% - 32px, 760px);
+        }
+
+        header,
+        .section-heading {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .content {
+          margin-top: 18px;
+        }
+
+        .entity-grid,
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+
+        .strength-card {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-step {
+          grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">回到課程首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Section 04</span>
+          <h1 id="page-title">RAG：讓 LLM 根據資料回答</h1>
+          <p class="lede">
+            檢索增強生成（Retrieval-Augmented Generation, RAG）會先從外部知識庫或文件中找回與問題相關的資料，再讓大型語言模型根據這些資料生成答案，使回答更接近可查證、可追溯的內容。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="本節小節導覽">
+          <a href="#opening" aria-current="page">1. RAG 是什麼</a>
+          <a href="#retrieval">2. 找資料再回答</a>
+          <a href="#library-view">3. 圖書館情境</a>
+          <a href="#limits">4. RAG 的限制</a>
+          <a href="#practice">5. 小練習</a>
+        </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>理解什麼是 RAG。</li>
+                <li>說明 RAG 為什麼能提升 LLM 回答時的可查證性。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="opening" aria-labelledby="opening-title">
+          <div class="section-heading">
+            <h2 id="opening-title">RAG 是什麼</h2>
+            <div class="content">
+              <p class="statement">
+                RAG 可以理解為「先檢索，再生成」，也就是先找回相關資料，再根據資料產生較有依據、較容易追溯來源的回答。
+              </p>
+              <p>
+                大型語言模型作答時，主要根據訓練時學到的語言模式與當下提示進行生成。在 RAG 中，系統會先依據問題去檢索資料庫，再把找到的內容一併提供給大型語言模型來生成答案。因此，模型不是憑記憶或語言機率回答，而是根據檢索回來的資料來生成答案。
+              </p>
+              <figure class="rag-flow-figure">
+                <div class="image-frame">
+                  <button
+                    class="image-zoom-button"
+                    type="button"
+                    data-image-modal-open
+                    data-modal-src="./assets/rag-flow.png"
+                    data-modal-alt="RAG 流程圖，包含使用者提問、語意搜尋、向量資料庫、Prompt、LLM 與後處理流程。"
+                    aria-label="放大檢視 RAG流程"
+                  >
+                    <img
+                      src="./assets/rag-flow.png"
+                      alt="RAG 流程圖，包含使用者提問、語意搜尋、向量資料庫、Prompt、LLM 與後處理流程。"
+                    >
+                  </button>
+                </div>
+                <figcaption>
+                  RAG流程
+                  <br>
+                  Source:
+                  <a href="https://medium.com/@hamipirzada/understanding-the-rag-architecture-model-a-deep-dive-into-modern-ai-c81208afa391">Understanding the RAG Architecture Model</a>
+                </figcaption>
+              </figure>
+              <p>
+                在 RAG 中，使用者提出問題後，系統會根據問題進行語意搜尋，找出意思相近、內容相關的資料。這個搜尋通常會使用向量資料庫（vector database），查詢原始文件或新資料經過切分與向量化後的表示。右下角代表內容會匯入、處理、切分與向量化，最後存入向量資料庫。接著，系統會將使用者問題與檢索到的內容組成 prompt，再送給 LLM。LLM 依據這些補充資料產生回答後，系統再經過 post processing 整理內容，最後將 response 回傳給使用者。整體來說，RAG 的重點是讓 LLM 不只依靠原本的訓練知識，而是能參考外部資料，產生較符合資料內容的回答。
+              </p>
+              <h3>RAG 的基本流程</h3>
+              <p>
+                我們可以把上面的 RAG 流程簡化成三步。第一步是由理解問題，辨識查詢中的重點條件，例如主題、人物、作品、時間或資料範圍。第二步是檢索，把和這些條件相關的資料從資料庫中找出來。第三步則是生成，讓大型語言模型根據這些被找回來的內容整理出回答。
+              </p>
+              <div class="flow-steps" aria-label="RAG 三步驟">
+                <article class="flow-step">
+                  <div class="flow-step-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="6"></circle>
+                      <path d="M20 20l-4.2-4.2"></path>
+                    </svg>
+                  </div>
+                  <div class="flow-step-body">
+                    <h4>1. 理解問題</h4>
+                    <p>模型或檢索器先判斷問題在問什麼，辨認關鍵條件與限制。</p>
+                  </div>
+                </article>
+                <article class="flow-step">
+                  <div class="flow-step-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <ellipse cx="12" cy="6" rx="6.5" ry="2.5"></ellipse>
+                      <path d="M5.5 6v8c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5V6"></path>
+                      <path d="M5.5 10c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5"></path>
+                    </svg>
+                  </div>
+                  <div class="flow-step-body">
+                    <h4>2. 找回資料</h4>
+                    <p>系統根據條件，從資料來源中找出最相關的內容片段或紀錄。</p>
+                  </div>
+                </article>
+                <article class="flow-step">
+                  <div class="flow-step-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 6h16v9H8l-4 3V6z"></path>
+                      <path d="M8 10h8"></path>
+                      <path d="M8 13h5"></path>
+                    </svg>
+                  </div>
+                  <div class="flow-step-body">
+                    <h4>3. 整理回答</h4>
+                    <p>大型語言模型根據找回來的內容，用自然語言回覆使用者。</p>
+                  </div>
+                </article>
+              </div>
+              <p>
+                對使用者來說，這看起來像一次問答；但在系統背後，其實已經先做了一次檢索工作。也因為如此，RAG 的品質不只取決於模型，也取決於資料有沒有被好好整理、切分、描述與索引。
+              </p>
+              <p>
+                舉例來說，當使用者問「A公司今年的員工旅遊補助是多少？」時，大型語言模型可能只能根據訓練資料和語言模式推測。而 RAG 會先到資料庫中進行檢索，查找關於這個年份的員工旅遊補助資料。如果有找到適當資料，模型就會根據這段內容回答。
+              </p>
+              <p>
+                簡言之，RAG 在大型語言模型回答前，先找到與問題相關的文本、紀錄、條目或知識片段，讓大型語言模型用來生成回答。這樣的設計適合需要根據特定資料、館藏、文件內容來回答的情境。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="retrieval" aria-labelledby="retrieval-title">
+          <div class="section-heading">
+            <h2 id="retrieval-title">先找資料，再讓模型回答</h2>
+            <div class="content">
+              <p>
+                RAG 讓回答不是憑空生成，而是大型語言模型依據具體資料整理成回覆。換句話說，系統不是直接要求模型憑既有知識回答，而是先根據使用者的問題，包含文本、紀錄、條目、摘要、主題標示或評論，再把這些資料一併提供給模型來回答。
+              </p>
+              <figure class="rag-flow-figure">
+                <div class="image-frame">
+                  <button
+                    class="image-zoom-button"
+                    type="button"
+                    data-image-modal-open
+                    data-modal-src="./assets/rag-library-flow.png"
+                    data-modal-alt="RAG 流程示意圖，顯示使用者提問、系統從多種文件與資料庫檢索內容，再整理成回覆。"
+                    aria-label="放大檢視 RAG 檢索與生成示意圖"
+                  >
+                    <img
+                      src="./assets/rag-library-flow.png"
+                      alt="RAG 流程示意圖，顯示使用者提問、系統從多種文件與資料庫檢索內容，再整理成回覆。"
+                    >
+                  </button>
+                </div>
+                <figcaption>
+                  RAG 先依問題檢索相關資料，再把找回的內容交給模型整理成回答。
+                </figcaption>
+              </figure>
+              <p>
+                例如，使用者問「台積電最近一季的營收表現如何？」一般大型語言模型本身不一定掌握最新財報或即時公告，也不應該只根據過去訓練資料推測。RAG 系統可以先從公司財報、法說會簡報、重大訊息公告或財經資料庫中，檢索台積電最近一季的營收、毛利率、淨利、每股盈餘與管理層說明，再把這些內容提供給模型。模型接著根據檢索到的資料，整理出該季營收是成長或下滑、主要原因是什麼，以及公司對後續展望的說法。如果系統設計得更完整，也可以同時附上資料來源與公告時間，讓使用者知道這段回答是依據哪一份財報或哪一次法說會資料產生的。
+              </p>
+              <p>
+                這麼做可以讓系統的回答更容易連回資料來源，使用者不只會得到整理後的文字，也可以看到回答的依據，這使得回答可以被檢查、追溯與修正。當公司發布新的財報、公告或市場資料時，系統也可以重新檢索最新內容，讓回答更貼近目前可用的資料。
+              </p>
+              <p>
+                因此，RAG 適合應用在需要依據資料回答的情境。它的重點不是讓模型取代資料庫，而是讓模型在資料庫檢索結果的基礎上，並協助使用者理解、比較與整理資訊。
+              </p>
+              <aside class="note-panel">
+                <h3>RAG 的重點</h3>
+                <p>
+                  RAG 在模型生成回答前，先加入一層資料檢索與依據。它的作用是讓回答盡量建立在可查找、可追溯的資料之上，並讓使用者更容易檢查答案來自哪些文件、紀錄或資料來源。
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="library-view" aria-labelledby="library-title">
+          <div class="section-heading">
+            <h2 id="library-title">圖書館中的 RAG</h2>
+            <div class="content">
+              <p class="query">
+                問題例：我想找有館內有那些內容有提到神啊鬼的中文輕小說。
+              </p>
+              <p>
+                RAG 可以基於館藏目錄中的書目紀錄和外部連結內容，作為資料庫來檢索並提供LLM做生成。當使用者提出自然語言問題時，系統先從這些資料中找出相關內容，再讓模型將結果整理成更容易閱讀的回答。這樣的設計能降低使用者操作系統的難度，也能協助讀者服務人員回應查詢需求，例如推薦相關館藏、引導讀者找到合適的資料庫、整理主題資料，或說明某類資源的使用方式。
+              </p>
+              <p>
+                由於會使用資料庫的內容做為生成，資料庫的內容會直接影響生成答案的品質。如果像是題名、作者、主題、版本、語言、館藏地與典藏狀態等資訊正確，系統就更容易找回正確內容。反之，如果資料庫的內容本身就不正確，那 RAG 能提供的幫助就會打折扣。
+              </p>
+              <p>
+                換句話說，RAG 並不是只靠模型能力就能運作良好，它同時仰賴資料庫中的資料品質。良好的資料品質是讓系統能夠順利運作的基礎。資料組織得越清楚，模型後續整理出來的回答也越有機會準確、穩定，並且能夠連回可靠的來源。
+              </p>
+              <aside class="note-panel">
+                <h3>資料與 RAG</h3>
+                <p>
+                  RAG 的品質不只取決於大型語言模型的能力，也取決於資料內容的品質。
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="limits" aria-labelledby="limits-title">
+          <div class="section-heading">
+            <h2 id="limits-title">RAG 的限制</h2>
+            <div class="content">
+              <p>
+                從先前內容可知，雖然 RAG 能補強大型語言模型脫離資料作答的問題，但它不是萬靈丹。由於模型生成答案前，必須先依賴系統找回相關資料，因此如果檢索時找錯資料、漏掉關鍵資料，或找回來的內容本身不完整、不一致，最後生成的回答仍可能出現偏差。
+              </p>
+              <p>
+                此外，雖然 RAG 具有語意檢索能力，但對於實體關係的判斷上，仍然有不足之處－特別是難以由文字內容中直接呈現的語意或實體關係。由於 RAG 是以文字做為檢索基礎，在前句所說的情形中，可能無法提供足夠精準的關聯判斷。例如，系統可能找得到某位作者、某本書或某個主題的相關文字，但不一定能正確理解各相關作品之間的關聯與差異。若應用情境需要處理較複雜的實體關係，糋需要搭配進一步的結構化資料，像是詮釋資料、權威控制、知識圖譜等。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practice" aria-labelledby="practice-title">
+          <div class="section-heading">
+            <h2 id="practice-title">小練習</h2>
+            <div class="content">
+              <ol>
+                <li>用自己的話說明 RAG 為什麼可以理解為「先找資料，再回答」。</li>
+                <li>想一個圖書館問答情境，列出系統在回答前應該先找哪些資料。</li>
+                <li>說明如果資料本身整理得不清楚，RAG 可能會受到哪些影響。</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./section-03.html">
+            <span class="pager-label">上一節</span>
+            <span class="pager-title">03 RDF 與書目資料</span>
+            <span class="pager-note">回看書目資料如何被拆成實體、關係與可連結的知識結構。</span>
+          </a>
+          <a class="pager-link" href="./section-05.html">
+            <span class="pager-label">下一節</span>
+            <span class="pager-title">05 Graph RAG：讓 LLM 基於實體關係回答</span>
+            <span class="pager-note">延伸到圖結構檢索，看看關係資料如何幫助模型回答得更有脈絡。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Section 04
+      </footer>
+    </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt || "";
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+      closeModalButton.addEventListener("click", closeImageModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
+  </body>
+</html>
