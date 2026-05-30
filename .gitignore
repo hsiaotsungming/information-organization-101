@@ -1,0 +1,10 @@
+# Keep the published site and deployment config in version control.
+*
+!/.gitignore
+!/.github/
+!/.github/**
+!/site/
+!/site/**
+
+# Ignore Finder/metadata artifact files even inside the published site.
+site/**/._*
