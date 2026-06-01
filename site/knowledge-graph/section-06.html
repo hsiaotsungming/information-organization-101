@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>05 RAG：讓 LLM 根據資料回答｜05 Knowledge Graph</title>
+    <title>06 Graph RAG：讓 LLM 基於知識圖譜回答｜05 Knowledge Graph</title>
     <style>
       :root {
         color-scheme: light;
@@ -283,32 +283,37 @@
         text-align: center;
       }
 
-      .rag-flow-figure {
+      .resource-gallery {
         display: grid;
-        gap: 12px;
-        margin: 4px 0 0;
+        gap: 28px;
       }
 
-      .rag-flow-figure .image-frame {
+      .resource-figure {
+        display: grid;
+        gap: 10px;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .resource-figure img {
+        display: block;
         width: 100%;
-        overflow: hidden;
+        height: auto;
         border: 1px solid var(--line);
         border-radius: 8px;
         background: #ffffff;
         box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
       }
 
-      .rag-flow-figure img {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      .rag-flow-figure figcaption {
+      .resource-figure figcaption {
         color: var(--muted);
         font-size: 1rem;
         line-height: 1.6;
         text-align: center;
+      }
+
+      .resource-figure figcaption a {
+        color: var(--accent);
       }
 
       .strength-cards {
@@ -424,61 +429,6 @@
 
       .comparison-point p {
         font-size: clamp(1.18rem, 1.55vw, 1.38rem);
-        line-height: 1.68;
-      }
-
-      .flow-steps {
-        display: grid;
-        gap: 14px;
-      }
-
-      .flow-step {
-        display: grid;
-        grid-template-columns: 72px minmax(0, 1fr);
-        gap: 18px;
-        align-items: center;
-        padding: 20px 22px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
-        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
-      }
-
-      .flow-step-icon {
-        display: grid;
-        place-items: center;
-        width: 56px;
-        height: 56px;
-        border: 1px solid rgba(31, 79, 120, 0.2);
-        border-radius: 10px;
-        color: var(--accent);
-        background: #f4f8fb;
-      }
-
-      .flow-step-icon svg {
-        width: 30px;
-        height: 30px;
-        stroke: currentColor;
-        stroke-width: 2;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-
-      .flow-step-body {
-        display: grid;
-        gap: 4px;
-      }
-
-      .flow-step-body h4 {
-        margin: 0;
-        color: var(--ink);
-        font-size: clamp(1.22rem, 1.6vw, 1.45rem);
-        line-height: 1.4;
-      }
-
-      .flow-step-body p {
-        font-size: clamp(1.12rem, 1.4vw, 1.28rem);
         line-height: 1.68;
       }
 
@@ -677,10 +627,6 @@
           grid-template-columns: 1fr;
         }
 
-        .flow-step {
-          grid-template-columns: 1fr;
-        }
-
         .comparison-grid {
           grid-template-columns: 1fr;
         }
@@ -704,18 +650,18 @@
 
       <main>
         <section class="hero" aria-labelledby="page-title">
-          <span class="eyebrow">05 Knowledge Graph｜Section 05</span>
-          <h1 id="page-title">RAG：讓 LLM 根據資料回答</h1>
+          <span class="eyebrow">05 Knowledge Graph｜Section 06</span>
+          <h1 id="page-title">Graph RAG：讓 LLM 基於知識圖譜回答</h1>
           <p class="lede">
-            檢索增強生成（Retrieval-Augmented Generation, RAG）會先從外部知識庫或文件中找回與問題相關的資料，再讓大型語言模型根據這些資料生成答案，使回答更接近可查證、可追溯的內容。
+            Graph RAG 把 RAG 的檢索流程和知識圖譜中的實體關係結合起來，讓系統不只找相關文字，也能沿著資料中的關係脈絡來回答問題。
           </p>
         </section>
 
         <nav class="unit-nav" aria-label="本節小節導覽">
-          <a href="#opening" aria-current="page">1. RAG 是什麼</a>
-          <a href="#retrieval">2. 找資料再回答</a>
-          <a href="#library-view">3. 圖書館情境</a>
-          <a href="#limits">4. RAG 的限制</a>
+          <a href="#opening" aria-current="page">1. Graph RAG 是什麼</a>
+          <a href="#graph-retrieval">2. 沿著關係檢索</a>
+          <a href="#value">3. 什麼問題更適合</a>
+          <a href="#role">4. 知識圖譜的角色</a>
           <a href="#practice">5. 小練習</a>
         </nav>
 
@@ -724,8 +670,9 @@
             <h2 id="goals-title">本單元目標</h2>
             <div class="content">
               <ul>
-                <li>理解什麼是 RAG。</li>
-                <li>說明 RAG 為什麼能提升 LLM 回答時的可查證性。</li>
+                <li>區分一般 RAG 與 Graph RAG 在檢索概念上的差別。</li>
+                <li>理解 Graph RAG 如何根據實體與關係進行檢索。</li>
+                <li>說明知識圖譜中的資料可以從哪些來源而來，並理解它如何成為 Graph RAG 的知識基礎。</li>
               </ul>
             </div>
           </div>
@@ -733,175 +680,172 @@
 
         <section class="section" id="opening" aria-labelledby="opening-title">
           <div class="section-heading">
-            <h2 id="opening-title">RAG 是什麼</h2>
+            <h2 id="opening-title">RAG 與 Graph RAG</h2>
             <div class="content">
-              <p class="statement">
-                RAG 可以理解為「先檢索，再生成」，也就是先找回相關資料，再根據資料產生較有依據、較容易追溯來源的回答。
-              </p>
-              <p>
-                大型語言模型作答時，主要根據訓練時學到的語言模式與當下提示進行生成。在 RAG 中，系統會先依據問題去檢索資料庫，再把找到的內容一併提供給大型語言模型來生成答案。因此，模型不是憑記憶或語言機率回答，而是根據檢索回來的資料來生成答案。
-              </p>
-              <figure class="rag-flow-figure">
-                <div class="image-frame">
-                  <button
-                    class="image-zoom-button"
-                    type="button"
-                    data-image-modal-open
-                    data-modal-src="./assets/rag-flow.png"
-                    data-modal-alt="RAG 流程圖，包含使用者提問、語意搜尋、向量資料庫、Prompt、LLM 與後處理流程。"
-                    aria-label="放大檢視 RAG流程"
-                  >
-                    <img
-                      src="./assets/rag-flow.png"
-                      alt="RAG 流程圖，包含使用者提問、語意搜尋、向量資料庫、Prompt、LLM 與後處理流程。"
-                    >
-                  </button>
-                </div>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視RAG 和 Graph RAG 的檢索概念"
+                  data-image-modal-open
+                  data-modal-src="./assets/rag-vs-graph-rag-concept.png"
+                  data-modal-alt="RAG 和 Graph RAG 的檢索概念"
+                >
+                  <img src="./assets/rag-vs-graph-rag-concept.png" alt="RAG 和 Graph RAG 的檢索概念">
+                </button>
                 <figcaption>
-                  RAG流程
+                  RAG 和 Graph RAG 的檢索概念
                   <br>
                   Source:
-                  <a href="https://medium.com/@hamipirzada/understanding-the-rag-architecture-model-a-deep-dive-into-modern-ai-c81208afa391">Understanding the RAG Architecture Model</a>
+                  <a href="https://machinelearningmastery.com/vector-databases-vs-graph-rag-for-agent-memory-when-to-use-which/">改編自 https://machinelearningmastery.com/vector-databases-vs-graph-rag-for-agent-memory-when-to-use-which/</a>
                 </figcaption>
               </figure>
               <p>
-                在 RAG 中，使用者提出問題後，系統會根據問題進行語意搜尋，找出意思相近、內容相關的資料。這個搜尋通常會使用向量資料庫（vector database），查詢原始文件或新資料經過切分與向量化後的表示。右下角代表內容會匯入、處理、切分與向量化，最後存入向量資料庫。接著，系統會將使用者問題與檢索到的內容組成 prompt，再送給 LLM。LLM 依據這些補充資料產生回答後，系統再經過 post processing 整理內容，最後將 response 回傳給使用者。整體來說，RAG 的重點是讓 LLM 不只依靠原本的訓練知識，而是能參考外部資料，產生較符合資料內容的回答。
-              </p>
-              <h3>RAG 的基本流程</h3>
-              <p>
-                我們可以把上面的 RAG 流程簡化成三步。第一步是由理解問題，辨識查詢中的重點條件，例如主題、人物、作品、時間或資料範圍。第二步是檢索，把和這些條件相關的資料從資料庫中找出來。第三步則是生成，讓大型語言模型根據這些被找回來的內容整理出回答。
-              </p>
-              <div class="flow-steps" aria-label="RAG 三步驟">
-                <article class="flow-step">
-                  <div class="flow-step-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="11" cy="11" r="6"></circle>
-                      <path d="M20 20l-4.2-4.2"></path>
-                    </svg>
-                  </div>
-                  <div class="flow-step-body">
-                    <h4>1. 理解問題</h4>
-                    <p>模型或檢索器先判斷問題在問什麼，辨認關鍵條件與限制。</p>
-                  </div>
-                </article>
-                <article class="flow-step">
-                  <div class="flow-step-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                      <ellipse cx="12" cy="6" rx="6.5" ry="2.5"></ellipse>
-                      <path d="M5.5 6v8c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5V6"></path>
-                      <path d="M5.5 10c0 1.4 2.9 2.5 6.5 2.5s6.5-1.1 6.5-2.5"></path>
-                    </svg>
-                  </div>
-                  <div class="flow-step-body">
-                    <h4>2. 找回資料</h4>
-                    <p>系統根據條件，從資料來源中找出最相關的內容片段或紀錄。</p>
-                  </div>
-                </article>
-                <article class="flow-step">
-                  <div class="flow-step-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M4 6h16v9H8l-4 3V6z"></path>
-                      <path d="M8 10h8"></path>
-                      <path d="M8 13h5"></path>
-                    </svg>
-                  </div>
-                  <div class="flow-step-body">
-                    <h4>3. 整理回答</h4>
-                    <p>大型語言模型根據找回來的內容，用自然語言回覆使用者。</p>
-                  </div>
-                </article>
-              </div>
-              <p>
-                對使用者來說，這看起來像一次問答；但在系統背後，其實已經先做了一次檢索工作。也因為如此，RAG 的品質不只取決於模型，也取決於資料有沒有被好好整理、切分、描述與索引。
+                RAG 與 Graph RAG 進行檢索時，操作概念有明顯的不同。在 RAG 中，檢索通常是從一組文件、段落或資料庫紀錄中，找出和使用者問題在語意上接近的文字片段。檢索通常是從一組文件、段落或資料庫紀錄中，找出和使用者問題在語意或關鍵字上相近的文字片段。文件與問題都會先被轉換成向量，才能進行語意上的比對。大型語言模型接著根據這些被找回來的文字，整理並生成回答。
               </p>
               <p>
-                舉例來說，當使用者問「A公司今年的員工旅遊補助是多少？」時，大型語言模型可能只能根據訓練資料和語言模式推測。而 RAG 會先到資料庫中進行檢索，查找關於這個年份的員工旅遊補助資料。如果有找到適當資料，模型就會根據這段內容回答。
+                Graph RAG 則是通常以知識圖譜為基礎，檢索實體、關係與屬性所形成的結構。它不只判斷文字與問題間的相似度，也會辨識這些實體間的關係或結構能否回應問題。因此，Graph RAG 的檢索單位會是有著像人物、地點、作品、機構、事件、主題詞等實體，以及這些實體的屬性和實體間的關係。
               </p>
               <p>
-                簡言之，RAG 在大型語言模型回答前，先找到與問題相關的文本、紀錄、條目或知識片段，讓大型語言模型用來生成回答。這樣的設計適合需要根據特定資料、館藏、文件內容來回答的情境。
+                兩者的差異可以概括為，RAG 的檢索核心是語意相似的文本片段，Graph RAG 的檢索核心則是文本背後的實體、關係、屬性所構成的結構脈絡。前者適合回答局部、明確、文本證據集中於少數段落的問題。後者則更適合處理需要跨越多個實體、順著關係脈絡推理的問題，兩者在實務上也常搭配使用。
+              </p>
+              <p>
+                比方說，讀者提出「哪些人曾同時研究清代文字獄與出版審查，且其著作被收錄於同一機構館藏」這個問題。若用傳統檢索，讀者得分別查詢兩個主題、人工比對學者名單，再逐一確認各館館藏。RAG 雖能找到語意相近的段落，卻難以將散落各處的學者、著作與館藏串連起來。Graph RAG 則能沿著主題、學者、著作、館藏機構之間的關係脈絡逐步推導，一次找到答案。
+              </p>
+              <p>
+                簡言之，RAG 是把問題帶到文本集合中尋找相關內容。Graph RAG 則是先把文本集合轉換成可檢索、可摘要、可局部放大也可全域俯瞰的知識結構，再根據這個結構生成回答。這也是 Graph RAG 與 RAG 在檢索概念上最根本的差異。
               </p>
             </div>
           </div>
         </section>
 
-        <section class="section" id="retrieval" aria-labelledby="retrieval-title">
+        <section class="section" id="graph-retrieval" aria-labelledby="graph-retrieval-title">
           <div class="section-heading">
-            <h2 id="retrieval-title">先找資料，再讓模型回答</h2>
+            <h2 id="graph-retrieval-title">進行實體關係檢索</h2>
             <div class="content">
               <p>
-                RAG 讓回答不是憑空生成，而是大型語言模型依據具體資料整理成回覆。換句話說，系統不是直接要求模型憑既有知識回答，而是先根據使用者的問題，包含文本、紀錄、條目、摘要、主題標示或評論，再把這些資料一併提供給模型來回答。
+                Graph RAG 的關鍵，是讓系統能夠沿著實體之間的關係進行檢索。這裡的「沿著關係」可以理解為：系統不是只比對一段文字是否相似，而是從某個實體出發，依照資料中定義好的關係，找到其他相關實體。
               </p>
-              <figure class="rag-flow-figure">
-                <div class="image-frame">
+              <p>
+                例如，在圖書館資料中，「某作者—創作—某作品」、「某作品—具有主題—民俗信仰」、「某作品—有版本—繁體中文譯本」、「某版本—館藏於—某分館」都可以被視為實體關係。當使用者提出自然語言問題時，系統可以先辨識問題中的條件，再轉換成圖譜中的查詢路徑。這個過程不只是找出含有關鍵字的紀錄，而是判斷哪些資料在結構上符合使用者的需求。
+              </p>
+              <div class="resource-gallery" aria-label="實體關係檢索示意圖">
+                <figure class="resource-figure">
                   <button
                     class="image-zoom-button"
                     type="button"
+                    aria-label="放大檢視由表格化資料轉成知識圖譜"
                     data-image-modal-open
-                    data-modal-src="./assets/rag-library-flow.png"
-                    data-modal-alt="RAG 流程示意圖，顯示使用者提問、系統從多種文件與資料庫檢索內容，再整理成回覆。"
-                    aria-label="放大檢視 RAG 檢索與生成示意圖"
+                    data-modal-src="./assets/kg-table-to-graph.jpg"
+                    data-modal-alt="由表格化資料轉成知識圖譜"
                   >
-                    <img
-                      src="./assets/rag-library-flow.png"
-                      alt="RAG 流程示意圖，顯示使用者提問、系統從多種文件與資料庫檢索內容，再整理成回覆。"
-                    >
+                    <img src="./assets/kg-table-to-graph.jpg" alt="由表格化資料轉成知識圖譜">
                   </button>
-                </div>
+                  <figcaption>
+                    由表格化資料轉成知識圖譜
+                    <br>
+                    Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
+                  </figcaption>
+                </figure>
+                <figure class="resource-figure">
+                  <button
+                    class="image-zoom-button"
+                    type="button"
+                    aria-label="放大檢視SPARQL 查詢示意"
+                    data-image-modal-open
+                    data-modal-src="./assets/kg-sparql-query.jpg"
+                    data-modal-alt="SPARQL 查詢示意"
+                  >
+                    <img src="./assets/kg-sparql-query.jpg" alt="SPARQL 查詢示意">
+                  </button>
+                  <figcaption>
+                    SPARQL 查詢示意
+                    <br>
+                    Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
+                  </figcaption>
+                </figure>
+              </div>
+              <p>
+                知識圖譜常見的查詢語言包括 SPARQL 與 Cypher。SPARQL 是 RDF 知識圖譜常用的查詢語言，適合針對「主詞—謂詞—受詞」形式的資料進行語意精確的查詢；Cypher 則常見於 property graph 的查詢環境，使用圖形化的節點與關係模式描述查詢。這些查詢語言提供了一種方式，讓系統可以精確地表達「我要找哪些實體，以及它們之間必須具有什麼關係」。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="value" aria-labelledby="value-title">
+          <div class="section-heading">
+            <h2 id="value-title">Graph RAG 的優勢</h2>
+            <div class="content">
+              <p>
+                Graph RAG 適合處理需要理解資料之間關係的問題。如果只是問一段文件的摘要、某個條文的內容，或某份報告中的明確資訊，一般 RAG 已經可以處理。但如果問題涉及多個條件、多個實體，或需要跨資料來源整合，Graph RAG 通常更有優勢。這類問題像是：
+              </p>
+              <ul>
+                <li>找出某個主題中，某些作者的作品是否有繁體中文譯本。</li>
+                <li>推薦與某本書在出版時間、主題上相似，而且目前館內可借的資料。</li>
+                <li>說明某個人物與事件、地點或作品之間的關係。</li>
+              </ul>
+              <p>
+                這些問題表面上像是自然語言問答，但背後其實需要系統理解不同實體之間的關係。
+              </p>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視知識圖譜的建立模型和支援檢索示意"
+                  data-image-modal-open
+                  data-modal-src="./assets/kg-build-and-retrieval-model.jpg"
+                  data-modal-alt="知識圖譜的建立模型和支援檢索示意"
+                >
+                  <img src="./assets/kg-build-and-retrieval-model.jpg" alt="知識圖譜的建立模型和支援檢索示意">
+                </button>
                 <figcaption>
-                  RAG 先依問題檢索相關資料，再把找回的內容交給模型整理成回答。
+                  知識圖譜的建立模型和支援檢索示意
+                  <br>
+                  Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
                 </figcaption>
               </figure>
               <p>
-                例如，使用者問「台積電最近一季的營收表現如何？」一般大型語言模型本身不一定掌握最新財報或即時公告，也不應該只根據過去訓練資料推測。RAG 系統可以先從公司財報、法說會簡報、重大訊息公告或財經資料庫中，檢索台積電最近一季的營收、毛利率、淨利、每股盈餘與管理層說明，再把這些內容提供給模型。模型接著根據檢索到的資料，整理出該季營收是成長或下滑、主要原因是什麼，以及公司對後續展望的說法。如果系統設計得更完整，也可以同時附上資料來源與公告時間，讓使用者知道這段回答是依據哪一份財報或哪一次法說會資料產生的。
+                Graph RAG 也適合用在資料來源彼此相連的情境。知識圖譜的一個優點是可以和文字資料、不同資料集或外部知識來源結合。例如，可以把文字中的實體辨識出來，並連結到知識圖譜中的實體；也可以透過不同資料集之間的實體連結，進行跨來源查詢。由於是基於抽取出來的實體關係，Graph RAG 在需要基於事實資料回答的應用上，會更具優勢。
               </p>
               <p>
-                這麼做可以讓系統的回答更容易連回資料來源，使用者不只會得到整理後的文字，也可以看到回答的依據，這使得回答可以被檢查、追溯與修正。當公司發布新的財報、公告或市場資料時，系統也可以重新檢索最新內容，讓回答更貼近目前可用的資料。
+                但由另一方面來說，當資料本身沒有被整理成實體與關係，或者關係不清楚，Graph RAG 的效果就會受到限制。它不是讓模型變得自動理解所有關係，而是依賴資料中已經存在、或可以被抽取與建構出來的關係。因此，越是需要根據明確關係回答的問題，越適合使用 Graph RAG；越是單純摘要文字或回答單一文件內容的問題，則不一定需要加入圖譜。
               </p>
-              <p>
-                因此，RAG 適合應用在需要依據資料回答的情境。它的重點不是讓模型取代資料庫，而是讓模型在資料庫檢索結果的基礎上，並協助使用者理解、比較與整理資訊。
-              </p>
-              <aside class="note-panel">
-                <h3>RAG 的重點</h3>
-                <p>
-                  RAG 在模型生成回答前，先加入一層資料檢索與依據。它的作用是讓回答盡量建立在可查找、可追溯的資料之上，並讓使用者更容易檢查答案來自哪些文件、紀錄或資料來源。
-                </p>
-              </aside>
             </div>
           </div>
         </section>
 
-        <section class="section" id="library-view" aria-labelledby="library-title">
+        <section class="section" id="role" aria-labelledby="role-title">
           <div class="section-heading">
-            <h2 id="library-title">圖書館中的 RAG</h2>
+            <h2 id="role-title">知識圖譜的角色</h2>
             <div class="content">
               <p>
-                RAG 可以基於館藏目錄中的書目紀錄和外部連結內容，作為資料庫來檢索並提供LLM做生成。當使用者提出自然語言問題時，系統先從這些資料中找出相關內容，再讓模型將結果整理成更容易閱讀的回答。這樣的設計能降低使用者操作系統的難度，也能協助讀者服務人員回應查詢需求，例如推薦相關館藏、引導讀者找到合適的資料庫、整理主題資料，或說明某類資源的使用方式。
+                知識圖譜讓原本分散在不同欄位、紀錄或文件中的資訊，組織成可以被查詢與推理的關係網絡，成為 Graph RAG 的知識基礎。大型語言模型負責生成自然語言回答，而知識圖譜提供回答的依據，協助系統判斷哪些實體相關、它們如何連接，以及哪些資料可以作為回答依據。
+              </p>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視LLM vs. KG"
+                  data-image-modal-open
+                  data-modal-src="./assets/llm-vs-kg.jpg"
+                  data-modal-alt="LLM vs. KG"
+                >
+                  <img src="./assets/llm-vs-kg.jpg" alt="LLM vs. KG">
+                </button>
+                <figcaption>
+                  LLM vs. KG
+                  <br>
+                  Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
+                </figcaption>
+              </figure>
+              <p>
+                知識圖譜的基本資料模型雖然簡單，但相當有彈性。節點代表實體，帶標籤的邊代表關係，而 RDF 則以主詞、謂詞、受詞三元組作為核心資料模型。這種形式使得知識圖譜能夠描述人物、作品、地點、事件、主題、分類與其他實體之間的連結。這可以將原有資訊組織的結果，轉成使用 RDF 表示。也能在 LLM 或其它電腦工具的協助下，從非結構化資料中，抽取主詞、謂詞、受詞來形成 RDF 關係。
               </p>
               <p>
-                由於會使用資料庫的內容做為生成，資料庫的內容會直接影響生成答案的品質。如果像是題名、作者、主題、版本、語言、館藏地與典藏狀態等資訊正確，系統就更容易找回正確內容。反之，如果資料庫的內容本身就不正確，那 RAG 能提供的幫助就會打折扣。
+                在圖書館場景中，知識圖譜可以來自既有的資訊組織成果，例如書目紀錄、權威控制、主題標目、分類號、館藏資料、數位典藏詮釋資料與外部識別碼。這些資料若只是被當成文字欄位使用，模型只能做相似度比對，但若被整理成圖譜，系統就可以更清楚地知道這是不是同一位作者、這是不是同一作品的不同譯本、這個主題是不是另一個主題的下位概念等。
               </p>
               <p>
-                換句話說，RAG 並不是只靠模型能力就能運作良好，它同時仰賴資料庫中的資料品質。良好的資料品質是讓系統能夠順利運作的基礎。資料組織得越清楚，模型後續整理出來的回答也越有機會準確、穩定，並且能夠連回可靠的來源。
-              </p>
-              <aside class="note-panel">
-                <h3>資料與 RAG</h3>
-                <p>
-                  RAG 的品質不只取決於大型語言模型的能力，也取決於資料內容的品質。
-                </p>
-              </aside>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="limits" aria-labelledby="limits-title">
-          <div class="section-heading">
-            <h2 id="limits-title">RAG 的限制</h2>
-            <div class="content">
-              <p>
-                從先前內容可知，雖然 RAG 能補強大型語言模型脫離資料作答的問題，但它不是萬靈丹。由於模型生成答案前，必須先依賴系統找回相關資料，因此如果檢索時找錯資料、漏掉關鍵資料，或找回來的內容本身不完整、不一致，最後生成的回答仍可能出現偏差。
-              </p>
-              <p>
-                此外，雖然 RAG 具有語意檢索能力，但對於實體關係的判斷上，仍然有不足之處－特別是難以由文字內容中直接呈現的語意或實體關係。由於 RAG 是以文字做為檢索基礎，在前句所說的情形中，可能無法提供足夠精準的關聯判斷。例如，系統可能找得到某位作者、某本書或某個主題的相關文字，但不一定能正確理解各相關作品之間的關聯與差異。若應用情境需要處理較複雜的實體關係，糋需要搭配進一步的結構化資料，像是詮釋資料、權威控制、知識圖譜等。
+                在 LLM 的應用場景中，RDF 可以來自大量非結構化資料，例如研究論文、新聞報導、網頁內容、館藏描述、訪談紀錄、使用者評論與數位典藏文本。這些資料若只是被當成一般文字處理，模型通常只能依靠語意相似度或關鍵字來理解內容。在透過 LLM 抽取其中的實體、關係與屬性後，就能轉成 RDF 並形成知識圖譜，此時系統就能更明確地分析這些非結構化中的重要實體和關聯。如此一來，原本分散在文本中的知識便能被整理為可查詢、可連結、可推理的結構化資料。
               </p>
             </div>
           </div>
@@ -912,30 +856,30 @@
             <h2 id="practice-title">小練習</h2>
             <div class="content">
               <ol>
-                <li>用自己的話說明 RAG 為什麼可以理解為「先找資料，再回答」。</li>
-                <li>想一個圖書館問答情境，列出系統在回答前應該先找哪些資料。</li>
-                <li>說明如果資料本身整理得不清楚，RAG 可能會受到哪些影響。</li>
+                <li>用自己的話說明 Graph RAG 和一般 RAG 最大的不同是什麼。</li>
+                <li>請說明知識圖譜中的資料可以從哪些來源而來，並舉出一到兩種可能的資料形式。</li>
+                <li>請說明如果知識圖譜中的實體關係整理得不清楚或連結錯誤，Graph RAG 可能會受到哪些影響。</li>
               </ol>
             </div>
           </div>
         </section>
 
         <nav class="section-pager" aria-label="Section 前後導覽">
-          <a class="pager-link" href="./section-04.html">
+          <a class="pager-link" href="./section-05.html">
             <span class="pager-label">上一節</span>
-            <span class="pager-title">04 例子：描述知識結構</span>
-            <span class="pager-note">回看臺灣與國外描述知識結構的不同例子。</span>
+            <span class="pager-title">05 RAG：讓 LLM 根據資料回答</span>
+            <span class="pager-note">回看如何先找回可用資料，再讓模型根據內容生成答案。</span>
           </a>
-          <a class="pager-link" href="./section-06.html">
-            <span class="pager-label">下一節</span>
-            <span class="pager-title">06 Graph RAG：讓 LLM 基於知識圖譜回答</span>
-            <span class="pager-note">延伸到圖結構檢索，看看關係資料如何幫助模型回答得更有脈絡。</span>
+          <a class="pager-link" href="./index.html">
+            <span class="pager-label">章首頁</span>
+            <span class="pager-title">05 Knowledge Graph</span>
+            <span class="pager-note">回到本章目次，查看本章五個 Section。</span>
           </a>
         </nav>
       </main>
 
       <footer>
-        05 Knowledge Graph｜Section 05
+        05 Knowledge Graph｜Section 06
       </footer>
     </div>
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>05 Knowledge Graph｜資訊組織</title>
+    <title>05 Knowledge Graph 課程導覽</title>
     <style>
       :root {
         color-scheme: light;
@@ -16,7 +16,6 @@
         --panel: #ffffff;
         --accent: #1f4f78;
         --green: #2a8c7b;
-        --soft: #eef3f6;
       }
 
       * {
@@ -26,8 +25,7 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background:
-          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+        background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
       }
 
       .site {
@@ -93,10 +91,8 @@
 
       h1,
       h2,
-      h3,
       p {
         margin: 0;
-        letter-spacing: 0;
       }
 
       h1 {
@@ -212,7 +208,7 @@
     <div class="site">
       <header>
         <div class="brand">
-          <span class="brand-title">資訊組織</span>
+          <span class="brand-title">知識圖譜</span>
           <span>Information Organization 101</span>
         </div>
         <a class="back-link" href="../index.html">回到課程首頁</a>
@@ -223,71 +219,81 @@
           <span class="eyebrow">05 Knowledge Graph</span>
           <h1 id="page-title">知識圖譜</h1>
           <p class="lede">
-            本章討論知識圖譜如何把人、作品、主題、版本、館藏與概念組織成可連結、可查證、可維護的知識結構。
+            本單元聚焦在知識圖譜如何從 RDF 出發，延伸到 RAG 與 Graph RAG 的資料組織方式，作為理解結構化知識與生成式 AI 的參照脈絡。
           </p>
         </section>
 
-        <nav class="section-list" aria-label="05 Knowledge Graph 章節目次">
+        <nav class="section-list" aria-label="05 Knowledge Graph 單元列表">
           <a class="section-card" href="./section-01.html">
             <span class="section-number">Section 01</span>
             <span>
-              <h2>什麼是 Knowledge Graph？</h2>
-              <p>如何用實體、關係與屬性組織知識圖譜 & 圖書館書目紀錄如何轉成可連結的知識網絡。</p>
+              <h2>什麼是 Knowledge Graph</h2>
+              <p>先建立知識圖譜的基本概念，理解它如何描述實體、屬性與關係。</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
 
           <a class="section-card" href="./section-02.html">
             <span class="section-number">Section 02</span>
             <span>
-              <h2>為什麼生成式AI下還需要知識圖譜？</h2>
-              <p>大型語言模型有什麼強項與限制，而知識圖譜如何提供可查證、可連結、可維護的知識。</p>
+              <h2>生成式 AI 與大型語言模型</h2>
+              <p>理解大型語言模型的運作脈絡，作為後續連結知識圖譜與檢索機制的基礎。</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
 
           <a class="section-card" href="./section-03.html">
             <span class="section-number">Section 03</span>
             <span>
-              <h2>RDF 與書目資料</h2>
-              <p>書目紀錄如何利用三元組描述實體關係建立語意資料。</p>
+              <h2>RDF 與實體關係</h2>
+              <p>從 RDF 的三元組出發，理解實體關係如何被描述並組成結構化知識。</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
 
           <a class="section-card" href="./section-04.html">
             <span class="section-number">Section 04</span>
             <span>
-              <h2>RAG：讓 LLM 根據資料回答</h2>
-              <p>什麼是檢索增強生成？為什麼它能讓大型語言模型輸出更易於查證的內容，又有什麼技術限制。</p>
+              <h2>例子：描述知識結構</h2>
+              <p>在臺灣與國外，描述知識結構的不同例子</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
 
           <a class="section-card" href="./section-05.html">
             <span class="section-number">Section 05</span>
             <span>
-              <h2>Graph RAG：讓 LLM 基於實體關係回答</h2>
-              <p>說明什麼是 Graph RAG 和它如何利用知識圖譜。</p>
+              <h2>RAG 與 LLM 的資料檢索</h2>
+              <p>說明檢索增強生成如何在大型語言模型前加入資料檢索流程。</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a class="section-card" href="./section-06.html">
+            <span class="section-number">Section 06</span>
+            <span>
+              <h2>Graph RAG 與 LLM 結合知識圖譜</h2>
+              <p>進一步比較 Graph RAG 如何把知識圖譜納入生成式 AI 的回答脈絡。</p>
+            </span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
 
           <a class="section-card" href="./reference.html">
             <span class="section-number">Reference</span>
             <span>
               <h2>參考資料</h2>
-              <p>整理本章涉及的知識圖譜、RAG、Graph RAG 與圖書館鏈結資料相關參考文獻。</p>
+              <p>整理本單元提到的 RDF、RAG、Graph RAG 與相關知識圖譜資源。</p>
             </span>
-            <span class="arrow" aria-hidden="true">›</span>
+            <span class="arrow" aria-hidden="true">→</span>
           </a>
         </nav>
 
+        <aside class="note">
+          如果你是從 RDF 開始閱讀，這份首頁可以當成整個單元的導覽，幫助你把後面的 RAG 與 Graph RAG 放回同一條知識結構脈絡裡理解。
+        </aside>
       </main>
 
-      <footer>
-        05 Knowledge Graph
-      </footer>
+      <footer>05 Knowledge Graph</footer>
     </div>
   </body>
 </html>
