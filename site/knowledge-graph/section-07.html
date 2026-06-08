@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>07 建立 Knowledge Graph 的階段｜05 Knowledge Graph</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #172333;
+        background: #f7f8fa;
+        --ink: #172333;
+        --muted: #53616f;
+        --line: #d8dee6;
+        --panel: #ffffff;
+        --accent: #1f4f78;
+        --green: #2a8c7b;
+        --orange: #b25b2f;
+        --soft: #eef3f6;
+        --warm: #fbf5ec;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f7f8fa 44%, #eef3f6 100%);
+      }
+
+      .site {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        color: var(--ink);
+        font-size: 1.08rem;
+        font-weight: 700;
+      }
+
+      .brand span,
+      .back-link {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .back-link {
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        padding: 8px 0;
+      }
+
+      .back-link:hover {
+        color: var(--accent);
+        border-color: var(--green);
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      .unit-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .unit-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: #334155;
+        background: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+        font-size: 0.96rem;
+        font-weight: 700;
+      }
+
+      .unit-nav a[aria-current="page"] {
+        color: #ffffff;
+        border-color: var(--accent);
+        background: var(--accent);
+      }
+
+      .hero {
+        max-width: 980px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: var(--green);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        color: var(--ink);
+        font-size: clamp(3rem, 6.2vw, 5.8rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        color: var(--ink);
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 8px 0 10px;
+        color: var(--ink);
+        font-size: clamp(1.35rem, 2vw, 1.7rem);
+        line-height: 1.3;
+      }
+
+      .lede {
+        max-width: 900px;
+        margin-top: 24px;
+        color: #40505f;
+        font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        line-height: 1.62;
+      }
+
+      .section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 36px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        font-size: clamp(1.2rem, 1.6vw, 1.48rem);
+        line-height: 1.72;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 1.35em;
+      }
+
+      li + li {
+        margin-top: 10px;
+      }
+
+      .field-role-list {
+        padding-left: 3.5em;
+      }
+
+      .note-panel {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 12px 30px rgba(23, 35, 51, 0.05);
+      }
+
+      .note-panel {
+        background: var(--warm);
+      }
+
+      .resource-figure {
+        display: grid;
+        gap: 10px;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .image-zoom-button {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      .image-zoom-button:focus-visible {
+        outline: 4px solid rgba(31, 79, 120, 0.32);
+        outline-offset: 4px;
+      }
+
+      .resource-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .resource-figure figcaption {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .ifla-tasks-figure .image-crop {
+        width: 100%;
+        aspect-ratio: 1672 / 471;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(23, 35, 51, 0.06);
+      }
+
+      .ifla-tasks-figure .image-crop img {
+        display: block;
+        width: 100%;
+        max-width: none;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-25%);
+      }
+
+      .image-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        background: rgba(15, 23, 42, 0.78);
+      }
+
+      .image-modal.is-open {
+        display: grid;
+      }
+
+      .image-modal-content {
+        position: relative;
+        width: min(1200px, 100%);
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .image-modal-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-modal-close {
+        position: sticky;
+        top: 16px;
+        left: calc(100% - 56px);
+        margin: 16px 16px 0 auto;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.78);
+        color: #ffffff;
+        font-size: 1.4rem;
+        cursor: pointer;
+      }
+
+      .image-modal-close:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.72);
+        outline-offset: 3px;
+      }
+
+      .section-pager {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .pager-link {
+        display: grid;
+        gap: 6px;
+        padding: 22px 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.86);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .pager-label {
+        color: var(--green);
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .pager-title {
+        color: var(--ink);
+        font-size: 1.22rem;
+        font-weight: 700;
+      }
+
+      .pager-note {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      footer {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      @media (max-width: 860px) {
+        .site {
+          width: min(100% - 32px, 860px);
+        }
+
+        header {
+          display: block;
+        }
+
+        .back-link {
+          display: inline-block;
+          margin-top: 18px;
+        }
+
+        .section-heading {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+
+        .section-pager {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="site">
+      <header>
+        <div class="brand">
+          <span class="brand-title">資訊組織</span>
+          <span>Information Organization 101</span>
+        </div>
+        <a class="back-link" href="../index.html">回到課程首頁</a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <span class="eyebrow">05 Knowledge Graph｜Section 07</span>
+          <h1 id="page-title">建立 Knowledge Graph 的階段</h1>
+          <p class="lede">
+            將資料轉換為知識圖譜的六步驟工作流程。
+          </p>
+        </section>
+
+        <nav class="unit-nav" aria-label="本節小節導覽">
+          <a href="#goals-title" aria-current="page">1. 本單元目標</a>
+          <a href="#workflow-title">2. 六步驟工作流程</a>
+          <a href="#domain-title">3. 領域理解</a>
+          <a href="#data-title">4. 資料理解</a>
+          <a href="#representation-title">5. 表示形式</a>
+          <a href="#ontology-title">6. 本體匯入</a>
+          <a href="#annotation-title">7. 標註資料</a>
+          <a href="#querying-title">8. 查詢與推理</a>
+          <a href="#practice-title">9. 小練習</a>
+        </nav>
+
+        <section class="section" aria-labelledby="goals-title">
+          <div class="section-heading">
+            <h2 id="goals-title">本單元目標</h2>
+            <div class="content">
+              <ul>
+                <li>理解建立知識圖譜時需要處理哪些領域、資料與模型層面的問題。</li>
+                <li>說明將既有資料轉換為知識圖譜時，六個主要步驟之間的關聯。</li>
+                <li>理解查詢與推理需求如何反過來影響知識圖譜的設計。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="workflow-title">
+          <div class="section-heading">
+            <h2 id="workflow-title">六步驟工作流程</h2>
+            <div class="content">
+              <p>
+                建立知識圖譜（Knowledge Graph）需要處理領域需求、資料內容、表示形式、本體設計、標註資料等問題，並考慮查詢與推理需求，整合為一個完整的工作流程。過程中，是要將既有資料重新組織為具有語意關係、可查詢、可連結，並可支援推理的知識結構，之後才能將資料匯入圖資料庫。整個過程，可以分成六個步驟：
+              </p>
+              <ol>
+                <li>釐清領域理解（domain understanding）</li>
+                <li>進行資料理解（data understanding）</li>
+                <li>選擇圖表示形式（graph representation）</li>
+                <li>知識本體匯入（ontology ingestion）</li>
+                <li>標註資料匯入（annotation ingestion）</li>
+                <li>驗證查詢與推理能力（querying and reasoning）</li>
+              </ol>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視知識圖譜建構流程示意：CRISP-DM 的例子"
+                  data-image-modal-open
+                  data-modal-src="./assets/kg-construction-process.jpg"
+                  data-modal-alt="知識圖譜建構流程示意：CRISP-DM 的例子"
+                >
+                  <img src="./assets/kg-construction-process.jpg" alt="知識圖譜建構流程示意：CRISP-DM 的例子">
+                </button>
+                <figcaption>
+                  知識圖譜建構流程示意：CRISP-DM 的例子
+                  <br>
+                  Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
+                </figcaption>
+              </figure>
+              <p>
+                要將資料轉換為知識圖譜，不是單純將資料表改寫圖資料庫，而是要將目前的資料表、欄位、標註與詮釋資料，透過本體與模型重新組織為具有語意關係的知識網絡。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="domain-title">
+          <div class="section-heading">
+            <h2 id="domain-title">釐清領域理解</h2>
+            <div class="content">
+              <p>
+                第一步是釐清領域理解。在建立知識圖譜之前，需先確認此一知識圖譜要服務的問題與使用情境。例如，這個知識圖譜是要支援查詢、推理、推薦、資料整合，還是作為大型語言模型（Large Language Model, LLM）的知識依據層（grounding layer）。
+              </p>
+              <p>
+                若目標是推薦，因為推薦要判斷東西和使用者有多相關，可能需要重視使用者、物件、主題與行為之間的關係，才能知道同一個東西為什麼適合 A，卻不一定適合 B。若目標是資料整合，因為資料整合要判斷不同來源的資料是否指向同一個對象，可能需要重視不同資料來源之間的識別、對應與一致性，才能知道兩筆看起來不同的資料其實是否在描述同一個人、同一件事或同一個物件。若目標是大型語言模型的知識依據，因為我們需要讓模型生成的回答有明確根據，可能需要重視來源、脈絡、可追溯能力，以及查詢結果是否容易被模型取用，才能讓回答可檢查、可更新，也比較不容易脫離原意。
+              </p>
+              <p>
+                在這個階段，要處理的核心問題是：這個知識圖譜要幫使用者回答什麼問題？建立知識圖譜前，可以先列出一組能力問題（competency questions），也就是這個圖譜完成後應該能回答的代表性問題。例如，目錄系統的任務有：
+              </p>
+              <ol>
+                <li>Find：需要能夠依照作者、題名、主題或其他條件，尋找符合需求的資源。</li>
+                <li>Identify：需要能夠識別找到的資源，並將它與相似或容易混淆的資源區分開來。</li>
+                <li>Select：需要能夠判斷某項資源的版本、語言、形式或內容是否符合自己的需求。</li>
+                <li>Obtain：需要能夠取得或存取所選資源，例如借閱、下載、線上閱讀或取得館藏位置。</li>
+                <li>Explore：需要能夠透過資源、作者、主題或其他實體之間的關係，進一步探索相關內容。</li>
+              </ol>
+              <figure class="resource-figure ifla-tasks-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視IFLA Library Reference Model 定義的使用者任務"
+                  data-image-modal-open
+                  data-modal-src="./assets/ifla-lrm-user-tasks.png"
+                  data-modal-alt="IFLA Library Reference Model 定義的使用者任務"
+                >
+                  <div class="image-crop">
+                    <img src="./assets/ifla-lrm-user-tasks.png" alt="IFLA Library Reference Model 定義的使用者任務">
+                  </div>
+                </button>
+                <figcaption>
+                  IFLA Library Reference Model 定義的使用者任務
+                </figcaption>
+              </figure>
+              <p>
+                這些問題會決定需要建立哪些實體、關係、屬性的模型。若沒有先定義使用情境，知識圖譜很容易只是將資料表轉換成節點與邊，但缺乏處理使用者問題的能力。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="data-title">
+          <div class="section-heading">
+            <h2 id="data-title">進行資料理解</h2>
+            <div class="content">
+              <p>
+                結構化資料通常包含是表格與欄位所組成，這些是為了儲存、管理或檢索而設計。需要進一步判斷這些欄位在知識結構中代表什麼意義後，才能形成知識圖譜。這包括檢視分類碼、詮釋資料架構（metadata schema），或是檢視主鍵、外鍵等。
+              </p>
+              <p>
+                建構時需要先理解每個欄位的角色，判斷它應被視為實體、屬性，或實體之間的關係。例如，在一筆書目資料中，作者、出版者、主題與出版年等欄位，可以分別被重新理解為圖書、人物、出版者、主題等實體，也可以被轉換為「撰寫」、「由某出版者出版」、「具有主題」等關係。出版年則可能只是圖書的屬性，也可能在特定研究情境中被轉換為時間節點，用來支援年代、時期或歷史脈絡分析。
+              </p>
+              <p>
+                也就是說，建構時不是只問要不要匯入某個欄位，而要問在知識圖譜中應該如何被表達。例如：
+              </p>
+              <ol class="field-role-list">
+                <li>作者欄位：若需要被識別、區分、合併或連結到其他資料，則可將其視為可辨識的人物實體。</li>
+                <li>主題欄位：若需要呈現階層、關聯、同義詞或概念脈絡，則可將其視為主題概念體系中的節點。</li>
+                <li>出版者欄位：若需要連結到機構、出版活動或歷史脈絡，則可將其視為更廣泛出版關係中的一部分。</li>
+                <li>年分欄位：若需要用來區分版本、描述事件順序、建立時間脈絡或連結到特定時期，則可將其視為具有分析意義的時間資訊。</li>
+                <li>地點欄位：若需要被識別、區分、標準化，或連結到機構、事件、出版活動與歷史脈絡，則可將其視為可辨識的地點實體。</li>
+              </ol>
+              <p>
+                此外，建立知識圖譜前，需要檢查資料的品質，像是是否有重複名稱、異名、缺漏值、不一致的分類、不同來源之間的編碼差異，以及同名異人或同名異物等問題。若這些問題未先處理，匯入後的知識圖譜可能會形成錯誤連結，使查詢與推理結果失真。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="representation-title">
+          <div class="section-heading">
+            <h2 id="representation-title">選擇圖表示形式</h2>
+            <div class="content">
+              <p>
+                常見的圖表示形式包括資源描述框架（Resource Description Framework, RDF）與標籤屬性圖（Labeled Property Graph, LPG）。這兩者都能用來表示實體與關係，但其設計理念與適合的應用情境不同。
+              </p>
+              <p>
+                資源描述框架較接近語意網與本體的傳統，強調以三元組表示資料，也就是主詞、述詞與受詞的結構。其優勢在於標準化、可交換性、跨系統整合，以及與本體推理的結合。資源描述框架知識圖譜通常會搭配資源識別碼、RDFS、OWL、SPARQL 等技術，使資料具有較明確的語意基礎，也較適合需要跨資料來源交換、連結與推理的情境。
+              </p>
+              <div class="note-panel">
+                <p>
+                  SPARQL<br>
+                  SPARQL 是用來查詢 RDF 資料的查詢語言，適合處理以「主詞—述詞—受詞」形式表達的資料。它常用於知識圖譜、鏈結資料與語意網環境中，用來查詢實體之間的關係、屬性與路徑。
+                </p>
+              </div>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視RDF 資料與 SPARQL 查詢示例"
+                  data-image-modal-open
+                  data-modal-src="./assets/rdf-sparql-example.webp"
+                  data-modal-alt="RDF 資料與 SPARQL 查詢示例"
+                >
+                  <img src="./assets/rdf-sparql-example.webp" alt="RDF 資料與 SPARQL 查詢示例">
+                </button>
+                <figcaption>
+                  RDF 資料與 SPARQL 查詢示例
+                  <br>
+                  查詢要找名稱為 Tryptophan Synthetase，且會作用在某個 Chemical 受質上的實體，答案是 Protein；實際上也可以設計更複雜的多條件或多步關係查詢。
+                  <br>
+                  Source: <a href="https://link.springer.com/article/10.1186/1471-2105-12-S2-S6/figures/1">Springer figure</a>
+                </figcaption>
+              </figure>
+              <p>
+                標籤屬性圖則常見於 Neo4j 等圖資料庫，以節點、關係、標籤與屬性作為主要建模單位。它的優點是直覺、彈性高，容易進行互動查詢、路徑分析、圖演算法與應用開發。相較於資源描述框架，標籤屬性圖通常更貼近工程實作與產品開發需求，適合需要快速建構查詢服務、推薦系統、風險分析、知識探索介面或 GraphRAG 應用的情境。
+              </p>
+              <div class="note-panel">
+                <p>
+                  Neo4j<br>
+                  Neo4j 是一套以圖形資料模型為核心的圖形資料庫系統，常用來儲存與查詢節點、關係與屬性所構成的資料。它採用標籤屬性圖模型，適合處理人物、組織、地點、主題、事件或物件之間的連結關係，並可透過 Cypher 查詢語言探索資料中的路徑、模式與關聯。
+                </p>
+              </div>
+              <div class="note-panel">
+                <p>
+                  標籤屬性圖（Labeled Property Graph, LPG）<br>
+                  標籤屬性圖是一種以節點、關係與屬性來表示資料的圖形資料模型。節點和關係可以帶有標籤，並附加鍵值形式的屬性，因此適合描述人物、物件、事件與行為之間的關係。
+                </p>
+              </div>
+              <p>
+                在選擇圖表示形式時，除了考慮技術偏好外，也可以考慮以下目標。若重視標準化、本體推理、跨系統交換與長期資料互通，資源描述框架通常較為合適。若重視應用查詢、圖分析、工程實作與系統互動，標籤屬性圖可能較為方便。實務上也不一定只能二選一，有些系統會以資源描述框架管理語意標準與本體層，再將資料轉換到圖資料庫中支援應用查詢與分析。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="ontology-title">
+          <div class="section-heading">
+            <h2 id="ontology-title">知識本體匯入</h2>
+            <div class="content">
+              <p>
+                知識本體在知識圖譜中扮演知識骨架的角色，負責定義有哪些類別、類別之間有什麼關係、哪些屬性合法，以及概念之間的上下位、等價或限制關係。如果資料是知識圖譜的內容，本體則是讓這些內容能被一致理解與組織的結構。
+              </p>
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視IFLA LRM 以實體、關係與階層結構呈現書目資料的概念模型"
+                  data-image-modal-open
+                  data-modal-src="./assets/ifla-lrm-ontology-model.jpg"
+                  data-modal-alt="IFLA LRM 以實體、關係與階層結構呈現書目資料的概念模型"
+                >
+                  <img src="./assets/ifla-lrm-ontology-model.jpg" alt="IFLA LRM 以實體、關係與階層結構呈現書目資料的概念模型">
+                </button>
+                <figcaption>
+                  IFLA LRM 以實體、關係與階層結構呈現書目資料的概念模型，展示了知識本體如何組織與連結不同概念。
+                  <br>
+                  Source: <a href="https://www.ifla.org/wp-content/uploads/2019/05/assets/cataloguing/frbr-lrm/ifla-lrm-august-2017_rev201712.pdf">IFLA LRM PDF</a>
+                </figcaption>
+              </figure>
+              <p>
+                例如，在書目知識圖譜中，本體可能會定義圖書、作者、出版者、主題、出版事件、地點等類別，也會定義「作者撰寫作品」、「作品由出版者出版」、「作品具有主題」、「出版事件發生於某時間」等關係。資料匯入時，每一筆書目資料就不再只是孤立紀錄，而是被接到這套知識架構中。
+              </p>
+              <p>
+                本體匯入的價值在於，它能讓知識圖譜不只是節點與邊的集合，而是具有語意約束與領域邏輯的結構。例如，若本體定義「期刊論文」是「學術作品」的一種，系統就可以透過推理知道所有期刊論文也屬於學術作品。若本體定義某些屬性只能連接特定類別，則可以用來檢查資料是否出現不合理關係。
+              </p>
+              <p>
+                初期來說，較好的做法通常是先依據使用情境建立一個可用的核心本體，定義最重要的類別、關係與屬性，再隨著資料匯入、查詢測試與應用需求逐步擴充。過度龐大的本體可能會增加建置成本，也可能讓資料對應變得困難。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="annotation-title">
+          <div class="section-heading">
+            <h2 id="annotation-title">進行標註資料匯入</h2>
+            <div class="content">
+              <p>
+                標註資料匯入指將資料中的標註、分類、對應結果、辨識結果或詮釋資料，轉換為知識圖譜中的節點與邊。例如，一份文件的紀錄中可能有主題標籤、人物標註、機構標註、時間標註或地點標註。這些標註資料可以被連接到文件，也可以進一步連接到其它的人物、機構、時間、地點與主題概念等實體。如此一來，文件就不只是全文資料，而是進入一個更大的知識網絡。使用者可以查詢某個人物出現在哪些文件中，也可以查詢某個主題與哪些機構、事件或地點相關。
+              </p>
+              <p>
+                匯入時的另一個重點是進行消歧義。不同資料來源可能使用不同名稱指稱同一個實體，例如作者姓名可能有縮寫、全名、不同語言譯名，機構名稱也可能有舊名、新名與簡稱。若不處理這些對應關係，知識圖譜中可能會出現多個其實指向同一對象的節點。反過來說，同一個名稱也可能指向不同實體，例如同名作者、同名地名或同名機構，因此需要透過識別碼、上下文、時間、來源或其他屬性進行區辨。
+              </p>
+              <p>
+                在標註資料匯入中，是把「對資料的描述」轉換為「可查詢的知識」。結構化資料提供了像是分類、標籤、詮釋、來源等資訊，而知識圖譜可以使標註不只是附屬欄位，而是能與其他實體形成關係的知識節點。這一步在大型語言模型與知識圖譜結合的情境中特別重要，這提供可以透過標註、抽取或對應來形成的知識連結。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="querying-title">
+          <div class="section-heading">
+            <h2 id="querying-title">設計與驗證查詢與推理</h2>
+            <div class="content">
+              <figure class="resource-figure">
+                <button
+                  class="image-zoom-button"
+                  type="button"
+                  aria-label="放大檢視知識圖譜作為核心知識表示"
+                  data-image-modal-open
+                  data-modal-src="./assets/kg-central-representation.jpg"
+                  data-modal-alt="知識圖譜作為核心知識表示"
+                >
+                  <img src="./assets/kg-central-representation.jpg" alt="知識圖譜作為核心知識表示">
+                </button>
+                <figcaption>
+                  知識圖譜作為核心知識表示
+                  <br>
+                  Source: Negro et al. 2026 - Knowledge Graphs and LLMs in Action
+                </figcaption>
+              </figure>
+              <p>
+                在建立的過程中，可以不斷透過查詢問題來檢查模型的表現是否合理，這是檢驗圖模型是否有效的重要方式。例如：
+              </p>
+              <ol>
+                <li>是否能查出某位作者相關的主題？</li>
+                <li>是否能沿著關係找到同一研究領域中的作品？</li>
+                <li>是否能找出某個主題在不同年代的發展？</li>
+                <li>是否能根據本體推理出某些隱含分類？</li>
+                <li>是否能讓大型語言模型透過檢索取得足夠明確且可追溯的知識片段？</li>
+              </ol>
+              <p>
+                這些查詢問題除了用來判斷前面的實體、關係、屬性與本體設計是否足以支援實際需求，也可以幫助發現模型設計上的問題。如果查詢結果不自然，或需要非常複雜的查詢才能得到基本答案，通常表示設計方式可能仍待改善。例如，某些設計成屬性的資訊，實際上應該被設計成節點。或著是某些關係可能太籠統，導致查詢時無法區分不同語意。某些類別可能切得太細，造成資料稀疏，也可能切得太粗，導致推理與分析不夠精確。
+              </p>
+              <p>
+                查詢通常是找出圖中已經明確存在的資料，推理則是根據本體、規則或語意約束，產生或辨識圖中未直接寫出的隱含知識。例如，若本體中定義博士論文是學位論文的一種，而某筆資料被標示為博士論文，系統就可以推得它也是學位論文。若定義某機構隸屬於某大學，而某作者任職於該機構，也可能進一步推導出作者與該大學之間的關聯。這類推理能力使知識圖譜不只是資料連結工具，也成為知識組織與語意擴展的基礎。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="practice-title">
+          <div class="section-heading">
+            <h2 id="practice-title">小練習</h2>
+            <div class="content">
+              <ol>
+                <li>請用自己的話說明建立 Knowledge Graph 為什麼需要先確認資料來源與範圍。</li>
+                <li>請舉一種你熟悉的資料，說明其中可能有哪些實體與關係可以被抽取。</li>
+                <li>請說明如果沒有驗證與修正步驟，知識圖譜在後續查詢或應用上可能出現哪些問題。</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <nav class="section-pager" aria-label="Section 前後導覽">
+          <a class="pager-link" href="./section-06.html">
+            <span class="pager-label">上一節</span>
+            <span class="pager-title">06 Graph RAG 與 LLM</span>
+            <span class="pager-note">回看知識圖譜如何支援 Graph RAG 的檢索與回答過程。</span>
+          </a>
+          <a class="pager-link" href="./reference.html">
+            <span class="pager-label">參考資料</span>
+            <span class="pager-title">Reference</span>
+            <span class="pager-note">查看本章引用的 RDF、RAG、Graph RAG 與知識圖譜資源。</span>
+          </a>
+        </nav>
+      </main>
+
+      <footer>
+        05 Knowledge Graph｜Section 07
+      </footer>
+    </div>
+
+    <div class="image-modal" role="dialog" aria-modal="true" aria-label="圖片放大檢視" data-image-modal hidden>
+      <div class="image-modal-content">
+        <button class="image-modal-close" type="button" aria-label="關閉大圖" data-image-modal-close>×</button>
+        <img src="" alt="" data-image-modal-img>
+      </div>
+    </div>
+
+    <script>
+      const modal = document.querySelector("[data-image-modal]");
+      const modalImage = document.querySelector("[data-image-modal-img]");
+      const closeModalButton = document.querySelector("[data-image-modal-close]");
+      let activeImageButton = null;
+
+      function openImageModal(button) {
+        activeImageButton = button;
+        modalImage.src = button.dataset.modalSrc;
+        modalImage.alt = button.dataset.modalAlt || "";
+        modal.hidden = false;
+        modal.classList.add("is-open");
+        closeModalButton.focus();
+      }
+
+      function closeImageModal() {
+        modal.classList.remove("is-open");
+        modal.hidden = true;
+        modalImage.src = "";
+        if (activeImageButton) {
+          activeImageButton.focus();
+        }
+      }
+
+      document.querySelectorAll("[data-image-modal-open]").forEach((button) => {
+        button.addEventListener("click", () => openImageModal(button));
+      });
+
+      closeModalButton.addEventListener("click", closeImageModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+          closeImageModal();
+        }
+      });
+    </script>
+  </body>
+</html>
